@@ -1,7 +1,4 @@
-using System;
 using UnityEngine;
-using UnityEngine.Animations;
-using Object = UnityEngine.Object;
 using Random = System.Random;
 
 public class GridRenderer : MonoBehaviour
@@ -11,15 +8,12 @@ public class GridRenderer : MonoBehaviour
 
     void Start()
     {
+        // Generate map 
         var mapGen = new MapGenerator(42, 100, 100);
-        for (int iteration = 0; iteration < 500; iteration++)
-        {
-            mapGen.Step();
-        }
+        var map = mapGen.GenerateMap(500);
 
-        var grid = mapGen.Grid;
-
-        GridDisplay = new GridDisplay(squarePrefab, grid);
+        // Display map
+        GridDisplay = new GridDisplay(squarePrefab, map);
     }
 }
 
@@ -30,7 +24,6 @@ public enum BlockType
     Freeze,
     Empty
 }
-
 
 public class GridDisplay
 {
@@ -71,43 +64,49 @@ public class GridDisplay
 
 public class GridTile
 {
-    public GameObject obj;
-    public SpriteRenderer spriteRenderer;
+    public GameObject Obj;
+    public SpriteRenderer SpriteRenderer;
 
     public GridTile(GameObject obj, SpriteRenderer spriteRenderer)
     {
-        this.obj = obj;
-        this.spriteRenderer = spriteRenderer;
+        Obj = obj;
+        SpriteRenderer = spriteRenderer;
     }
 }
 
 public class MapGenerator
 {
-    private readonly int _height;
-    private readonly int _width;
+    public readonly int Height;
+    public readonly int Width;
     public BlockType[,] Grid;
-    private int WalkerPosX;
-    private int WalkerPosY;
-
+    public Vector2Int WalkerPos;
     private Random _rand;
 
     public MapGenerator(int seed, int width, int height)
     {
-        _width = width;
-        _height = height;
-        Grid = new BlockType[width, height];
-        WalkerPosX = _width / 2;
-        WalkerPosY = _height / 2;
         _rand = new Random(seed);
+        Width = width;
+        Height = height;
+        WalkerPos = new Vector2Int(width / 2, height / 2);
+
+        Grid = new BlockType[width, height];
+    }
+
+    public BlockType[,] GenerateMap(int iterationCount)
+    {
+        Grid = new BlockType[Width, Height];
+        for (var iteration = 0; iteration < iterationCount; iteration++)
+        {
+            Step();
+        }
+
+        return Grid;
     }
 
     public void Step()
     {
-        int moveX = _rand.Next(-1, 2);
-        int moveY = _rand.Next(-1, 2);
-        WalkerPosX += moveX;
-        WalkerPosY += moveY;
-        Debug.Log($"{WalkerPosX}, {WalkerPosY}");
-        Grid[WalkerPosX, WalkerPosY] = BlockType.Empty;
+        WalkerPos += new Vector2Int(_rand.Next(-1, 2), _rand.Next(-1, 2));
+        Debug.Log($"{WalkerPos.x}, {WalkerPos.y}");
+        Grid[WalkerPos.x, WalkerPos.y] = BlockType.Empty;
     }
 }
