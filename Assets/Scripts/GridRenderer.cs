@@ -4,16 +4,26 @@ using Random = System.Random;
 public class GridRenderer : MonoBehaviour
 {
     public GameObject squarePrefab;
+    public MapGenerator MapGen;
     public GridDisplay GridDisplay;
 
     void Start()
     {
-        // Generate map 
-        var mapGen = new MapGenerator(42, 100, 100);
-        var map = mapGen.GenerateMap(500);
+        MapGen = new MapGenerator(42, 100, 100);
+        GridDisplay = new GridDisplay(squarePrefab);
 
-        // Display map
-        GridDisplay = new GridDisplay(squarePrefab, map);
+        var map = MapGen.GenerateMap(500);
+        GridDisplay.DisplayGrid(map);
+    }
+
+
+    private void Update()
+    {
+        if (Input.GetKeyDown("r"))
+        {
+            var map = MapGen.GenerateMap(500);
+            GridDisplay.DisplayGrid(map);
+        }
     }
 }
 
@@ -27,23 +37,54 @@ public enum BlockType
 
 public class GridDisplay
 {
+    // define some colors TODO: move this somewhere else
     public Color Hookable = new Color(1f, 0.86f, 0.27f);
     public Color Unhookable = new Color(0.29f, 0.45f, 0.5f);
     public Color Freeze = new Color(0.01f, 0f, 0.02f);
     public Color Empty = new Color(1.0f, 1.0f, 1.0f, 0.1f);
-    private readonly GameObject _squarePrefab;
 
-    public GridDisplay(GameObject squarePrefab, BlockType[,] grid)
+    private readonly GameObject _squarePrefab; // this is also really stupid
+
+    public GridTile[,] gridDisplayTiles; // keeps track of initiated tiles
+
+    public GridDisplay(GameObject squarePrefab)
     {
         _squarePrefab = squarePrefab;
+    }
+
+    public void ClearDisplay()
+    {
+        // no tiles are being displayed -> skip
+        if (gridDisplayTiles == null)
+            return;
+
+        // remove all existing tiles
+        for (int x = 0; x < gridDisplayTiles.GetLength(0); x++)
+        {
+            for (int y = 0; y < gridDisplayTiles.GetLength(1); y++)
+            {
+                Object.Destroy(gridDisplayTiles[x, y].Obj);
+            }
+        }
+
+        gridDisplayTiles = null;
+    }
+
+    public void DisplayGrid(BlockType[,] grid)
+    {
+        ClearDisplay(); // removes all existing tiles
+
+        gridDisplayTiles = new GridTile[grid.GetLength(0), grid.GetLength(1)];
         for (int x = 0; x < grid.GetLength(0); x++)
         {
             for (int y = 0; y < grid.GetLength(1); y++)
             {
-                InitializeSquare(new Vector2(x, y), grid[x, y]);
+                GridTile tile = InitializeSquare(new Vector2(x, y), grid[x, y]);
+                gridDisplayTiles[x, y] = tile;
             }
         }
     }
+
 
     private GridTile InitializeSquare(Vector2 position, BlockType type)
     {
@@ -95,6 +136,8 @@ public class MapGenerator
     public BlockType[,] GenerateMap(int iterationCount)
     {
         Grid = new BlockType[Width, Height];
+        WalkerPos = new Vector2Int(Width / 2, Height / 2);
+
         for (var iteration = 0; iteration < iterationCount; iteration++)
         {
             Step();
