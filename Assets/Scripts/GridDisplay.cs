@@ -12,7 +12,7 @@ public class GridDisplay
 
     private readonly GameObject _squarePrefab; // this is also really stupid
     private GridTile[,] _gridDisplayTiles; // keeps track of initiated tiles
-    private BlockType[,] _currentGrid; // grid that is currently displayed
+    private Map _currentMap; // map that is currently displayed
 
     public GridDisplay(GameObject squarePrefab)
     {
@@ -37,50 +37,49 @@ public class GridDisplay
         _gridDisplayTiles = null;
     }
 
-    public void DisplayGrid(BlockType[,] grid)
+    public void DisplayGrid(Map map)
     {
-        if (_currentGrid == null) // initialize tiles if display function is called the first time
+        if (_currentMap == null) // initialize tiles if display function is called the first time
         {
-            InitializeDisplayTiles(grid);
+            InitializeDisplayTiles(map);
             return; // rest can be skipped since initialize function already sets the correct color for tiles 
         }
 
         // check dimensions of new grid TODO: long if statement, maybe wrap inside a function?
-        if (_currentGrid.GetLength(0) != grid.GetLength(0) ||
-            _currentGrid.GetLength(1) != grid.GetLength(1))
+        if (!Map.CheckSameDimension(_currentMap, map))
         {
             throw new IndexOutOfRangeException("grids have different dimension");
         }
 
         // update display using new grid
-        for (int x = 0; x < grid.GetLength(0); x++)
+        for (int x = 0; x < map.width; x++)
         {
-            for (int y = 0; y < grid.GetLength(1); y++)
+            for (int y = 0; y < map.height; y++)
             {
                 // check if type of current tile changed, if yes update display
-                if (_currentGrid[x, y] != grid[x, y])
+                if (_currentMap[x, y] != map[x, y])
                 {
-                    Debug.Log($"[GridDisplay] Update: ({x},{y}) {_currentGrid[x, y]} -> {grid[x, y]}");
-                    UpdateTileColor(_gridDisplayTiles[x, y], grid[x, y]);
+                    Debug.Log($"[GridDisplay] Update: ({x},{y}) {_currentMap[x, y]} -> {map[x, y]}");
+                    UpdateTileColor(_gridDisplayTiles[x, y], map[x, y]);
                 }
             }
         }
 
-        _currentGrid = grid;
+        _currentMap = map; // save new map for next update
     }
 
-    private void InitializeDisplayTiles(BlockType[,] grid)
+    private void InitializeDisplayTiles(Map map)
     {
         if (_gridDisplayTiles != null)
             throw new InvalidOperationException("tiles have already been initialized");
 
-        _gridDisplayTiles = new GridTile[grid.GetLength(0), grid.GetLength(1)];
-        _currentGrid = grid;
-        for (int x = 0; x < grid.GetLength(0); x++)
+        _gridDisplayTiles = new GridTile[map.width, map.height];
+        _currentMap = map;
+        for (int x = 0; x < map.width; x++)
         {
-            for (int y = 0; y < grid.GetLength(1); y++)
+            for (int y = 0; y < map.height; y++)
             {
-                GridTile tile = InitializeSquare(new Vector2(x, y), grid[x, y]);
+                GridTile tile = InitializeSquare(new Vector2(x, y), map[x, y]);
                 _gridDisplayTiles[x, y] = tile;
             }
         }
