@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using Random = System.Random;
+﻿using System;
+using UnityEngine;
 
 public class Map
 {
@@ -27,9 +27,37 @@ public class Map
         set => grid[x, y] = value;
     }
 
+    public string GetDebugString()
+    {
+        int emptyCount = 0;
+        int hookCount = 0;
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                if (this[x, y] == BlockType.Empty)
+                {
+                    emptyCount++;
+                }
+                else if (this[x, y] == BlockType.Hookable)
+                {
+                    hookCount++;
+                }
+            }
+        }
+
+        return $"hook={hookCount}, empty={emptyCount}";
+    }
+
     public static bool CheckSameDimension(Map map1, Map map2)
     {
         return map1.height == map2.height && map1.width == map2.width;
+    }
+
+    public Map Clone()
+    {
+        return new Map((BlockType[,])grid.Clone());
     }
 }
 
@@ -37,33 +65,40 @@ public class MapGenerator
 {
     public Vector2Int WalkerPos;
 
-    private Map _map;
-    private Random _rand;
+    public Map Map;
+    private int _width;
+    private int _height;
+    private RandomGenerator _rndGen;
 
     public MapGenerator(int seed, int width, int height)
     {
-        WalkerPos = new Vector2Int(width / 2, height / 2);
-        _rand = new Random(seed);
-        _map = new Map(width, height);
+        _rndGen = new RandomGenerator(seed);
+        _width = width;
+        _height = height;
+        Initialize();
+    }
+
+    public void Initialize()
+    {
+        WalkerPos = new Vector2Int(_width / 2, _height / 2);
+        Map = new Map(_width, _height);
     }
 
     public Map GenerateMap(int iterationCount)
     {
-        _map = new Map(_map.width, _map.height);
-        WalkerPos = new Vector2Int(_map.width / 2, _map.height / 2);
-
+        Initialize();
         for (var iteration = 0; iteration < iterationCount; iteration++)
         {
             Step();
         }
 
-        return _map;
+        return Map;
     }
 
     public void Step()
     {
-        WalkerPos += new Vector2Int(_rand.Next(-1, 2), _rand.Next(-1, 2));
-        Debug.Log($"{WalkerPos.x}, {WalkerPos.y}");
-        _map[WalkerPos.x, WalkerPos.y] = BlockType.Empty;
+        WalkerPos += _rndGen.GetRandomDirectionVector();
+        // Debug.Log($"{WalkerPos.x}, {WalkerPos.y}");
+        Map[WalkerPos.x, WalkerPos.y] = BlockType.Empty;
     }
 }

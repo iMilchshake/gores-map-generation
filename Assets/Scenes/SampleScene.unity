@@ -242,7 +242,7 @@ GameObject:
   - component: {fileID: 714146207}
   - component: {fileID: 714146206}
   m_Layer: 0
-  m_Name: Grid Renderer
+  m_Name: Map Generator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -261,6 +261,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   squarePrefab: {fileID: 5170055426446278379, guid: 21033ef0d2d54fc4a828486127ded13a, type: 3}
+  iterationsPerUpdate: 40
+  iterations: 400
 --- !u!4 &714146207
 Transform:
   m_ObjectHideFlags: 0

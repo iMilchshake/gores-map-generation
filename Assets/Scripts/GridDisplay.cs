@@ -65,7 +65,7 @@ public class GridDisplay
             }
         }
 
-        _currentMap = map; // save new map for next update
+        _currentMap = map.Clone(); // save new map for next update
     }
 
     private void InitializeDisplayTiles(Map map)
