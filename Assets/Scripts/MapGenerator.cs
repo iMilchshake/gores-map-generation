@@ -39,21 +39,21 @@ public class Map
     }
 }
 
-public class MoveProbabilities
+public class MoveArray
 {
-    private float[,] _probabilities;
-    private int size;
+    private float[,] _values;
+    private readonly int _size;
 
-    public MoveProbabilities(int size)
+    public MoveArray(int size)
     {
-        _probabilities = new float[size, size];
-        this.size = size;
+        _values = new float[size, size];
+        this._size = size;
     }
 
     public float this[int x, int y]
     {
-        get => _probabilities[MoveIndexToArrayIndex(x), MoveIndexToArrayIndex(y)];
-        set => _probabilities[MoveIndexToArrayIndex(x), MoveIndexToArrayIndex(y)] = value;
+        get => _values[MoveIndexToArrayIndex(x), MoveIndexToArrayIndex(y)];
+        set => _values[MoveIndexToArrayIndex(x), MoveIndexToArrayIndex(y)] = value;
     }
 
     public float this[Vector2Int vec]
@@ -65,19 +65,19 @@ public class MoveProbabilities
     private int MoveIndexToArrayIndex(int x)
     {
         // since _probabilities is squared, this function works for x and y
-        int centerX = (size - 1) / 2;
+        int centerX = (_size - 1) / 2;
         return centerX + x;
     }
 
     public Vector2Int[] GetAllValidMoves()
     {
-        Vector2Int[] validMoves = new Vector2Int[size * size];
+        Vector2Int[] validMoves = new Vector2Int[_size * _size];
         int index = 0;
-        for (int x = 0; x < size; x++)
+        for (int x = 0; x < _size; x++)
         {
-            for (int y = 0; y < size; y++)
+            for (int y = 0; y < _size; y++)
             {
-                validMoves[index] = new Vector2Int(x - (size - 1) / 2, y - (size - 1) / 2);
+                validMoves[index] = new Vector2Int(x - (_size - 1) / 2, y - (_size - 1) / 2);
                 index++;
             }
         }
@@ -125,16 +125,25 @@ public class MapGenerator
 
     public void Step()
     {
-        MoveProbabilities probabilities = new MoveProbabilities(3);
+        MoveArray probabilities = new MoveArray(3);
         var validMoves = probabilities.GetAllValidMoves();
 
+        MoveArray distances = new MoveArray(3);
+        float shortestDistance = float.MaxValue;
+        Vector2Int bestMove = Vector2Int.zero;
         foreach (var move in validMoves)
         {
-            var prob = probabilities[move];
-            Debug.Log(prob);
+            float dist = Vector2Int.Distance(WalkerTargetPos, WalkerPos + move);
+            distances[move] = dist;
+            if (dist < shortestDistance)
+            {
+                bestMove = move;
+                shortestDistance = dist;
+            }
         }
 
-        WalkerPos += _rndGen.GetRandomDirectionVector();
+        // WalkerPos += _rndGen.GetRandomDirectionVector();
+        WalkerPos += bestMove;
         Map[WalkerPos.x, WalkerPos.y] = BlockType.Empty;
     }
 }
