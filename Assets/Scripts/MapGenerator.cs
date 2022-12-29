@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityEditor.VersionControl;
 using UnityEngine;
 
 public class Map
@@ -84,6 +83,64 @@ public class MoveArray
 
         return validMoves;
     }
+
+    public void Normalize()
+    {
+        float sum = Sum();
+        for (int x = 0; x < _size; x++)
+        {
+            for (int y = 0; y < _size; y++)
+            {
+                _values[x, y] /= sum;
+            }
+        }
+    }
+
+    public float MaxValue()
+    {
+        float maxValue = float.MinValue;
+        for (int x = 0; x < _size; x++)
+        {
+            for (int y = 0; y < _size; y++)
+            {
+                if (_values[x, y] > maxValue)
+                    maxValue = _values[x, y];
+            }
+        }
+
+        return maxValue;
+    }
+
+    public float Sum()
+    {
+        float sum = 0;
+        for (int x = 0; x < _size; x++)
+        {
+            for (int y = 0; y < _size; y++)
+            {
+                sum += _values[x, y];
+            }
+        }
+
+        return sum;
+    }
+
+    public override String ToString()
+    {
+        var strOut = "";
+
+        for (int y = 0; y < _size; y++)
+        {
+            for (int x = 0; x < _size - 1; x++)
+            {
+                strOut += _values[x, y].ToString("0.00") + ",";
+            }
+
+            strOut += _values[_size - 1, y].ToString("0.00") + "\n";
+        }
+
+        return strOut;
+    }
 }
 
 public class MapGenerator
@@ -125,25 +182,43 @@ public class MapGenerator
 
     public void Step()
     {
-        MoveArray probabilities = new MoveArray(3);
+        int moveSize = 3;
+        MoveArray probabilities = new MoveArray(moveSize);
         var validMoves = probabilities.GetAllValidMoves();
+        float[] moveDistances = new float[moveSize * moveSize];
 
-        MoveArray distances = new MoveArray(3);
-        float shortestDistance = float.MaxValue;
-        Vector2Int bestMove = Vector2Int.zero;
-        foreach (var move in validMoves)
+        // calculate distances for each possbible move
+        for (int moveIndex = 0; moveIndex < moveSize * moveSize; moveIndex++)
         {
-            float dist = Vector2Int.Distance(WalkerTargetPos, WalkerPos + move);
-            distances[move] = dist;
-            if (dist < shortestDistance)
-            {
-                bestMove = move;
-                shortestDistance = dist;
-            }
+            float dist = Vector2Int.Distance(WalkerTargetPos, WalkerPos + validMoves[moveIndex]);
+            moveDistances[moveIndex] = dist;
         }
 
-        // WalkerPos += _rndGen.GetRandomDirectionVector();
-        WalkerPos += bestMove;
+        // sort moves by their respective distance to the goal
+        Debug.Log(String.Join(",", validMoves));
+        Array.Sort(moveDistances, validMoves);
+        Debug.Log(String.Join(",", validMoves));
+
+        Debug.Log(probabilities);
+
+        // assign each move a probability based on their index in the sorted order
+        for (int moveIndex = 0; moveIndex < moveSize * moveSize; moveIndex++)
+        {
+            var move = validMoves[moveIndex];
+            probabilities[move] = (float)MathUtil.GeometricDistribution(moveIndex + 1, 0.2f);
+        }
+
+        Debug.Log(probabilities);
+        probabilities.Normalize();
+        Debug.Log(probabilities);
+
+        // assign each move a probability based on their index in the sorted order
+        for (int moveIndex = 0; moveIndex < moveSize * moveSize; moveIndex++)
+        {
+            var move = validMoves[moveIndex];
+        }
+
+        WalkerPos += _rndGen.GetRandomDirectionVector();
         Map[WalkerPos.x, WalkerPos.y] = BlockType.Empty;
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class GridRenderer : MonoBehaviour
@@ -15,11 +16,12 @@ public class GridRenderer : MonoBehaviour
     {
         // generate map
         MapGen = new MapGenerator(42, 100, 100);
-        var map = MapGen.GenerateMap(iterations);
+        MapGen.Step();
+        //var map = MapGen.GenerateMap(iterations);
 
         // display map
-        GridDisplay = new GridDisplay(squarePrefab);
-        GridDisplay.DisplayGrid(map);
+        // GridDisplay = new GridDisplay(squarePrefab);
+        // GridDisplay.DisplayGrid(map);
     }
 
 

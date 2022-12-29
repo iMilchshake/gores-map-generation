@@ -14,4 +14,9 @@ public class RandomGenerator
     {
         return new Vector2Int(_rnd.Next(-1, 2), _rnd.Next(-1, 2)); // returns one of [-1, 0, 1] for x and y
     }
+
+    public Vector2Int PickRandomMove(MoveArray moves)
+    {
+        return Vector2Int.zero;
+    }
 }
