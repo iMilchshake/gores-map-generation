@@ -265,7 +265,7 @@ MonoBehaviour:
   unhookableColor: {r: 0.29, g: 0.45, b: 0.5, a: 1}
   freezeColor: {r: 0.01, g: 0, b: 0.05, a: 0.5}
   emptyColor: {r: 1, g: 1, b: 1, a: 0.1}
-  obstacleColor: {r: 0.43916875, g: 0.6698113, b: 0.43916875, a: 1}
+  obstacleColor: {r: 0.8117647, g: 0.6698113, b: 0.3882353, a: 1}
   iterationsPerUpdate: 5000
   maxIterations: 5000
   mapHeight: 100

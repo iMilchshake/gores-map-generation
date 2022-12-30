@@ -51,6 +51,17 @@ public class Map
 
         return true;
     }
+
+    public void FillArea(int x1, int y1, int x2, int y2, BlockType type)
+    {
+        for (var x = x1; x <= x2; x++)
+        {
+            for (var y = y1; y <= y2; y++)
+            {
+                grid[x, y] = type;
+            }
+        }
+    }
 }
 
 public class MoveArray
@@ -264,82 +275,92 @@ public class MapGenerator
         }
     }
 
-    public void PlaceObstacle()
+
+    // expands a rectangle starting from a starting position until it cant be further expanded
+    public (int, int, int, int) GetFloodFillArea(int xPos, int yPos)
     {
-        // get random empty point
-        var xPos = 0;
-        var yPos = 0;
-        while (Map[xPos, yPos] != BlockType.Empty)
-        {
-            (xPos, yPos) = _rndGen.GetRandomPosition(Map);
-        }
+        // bottom left point of rectangle
+        var x1 = xPos;
+        var y1 = yPos;
 
-        // Map[xPos, yPos] = BlockType.Obstacle;
+        // top right point of rectangle
+        var x2 = xPos;
+        var y2 = yPos;
 
-        Debug.Log($"found valid position at {xPos},{yPos}");
-
-        // start expanding area around point
-        var leftLocked = false;
         var upLocked = false;
         var rightLocked = false;
         var downLocked = false;
+        var leftLocked = false;
 
-        var leftOffset = 0;
-        var upOffset = 0;
-        var rightOffset = 0;
-        var downOffset = 0;
-
-        // this approach is fucking stupid wtf
         while (!(leftLocked && upLocked && rightLocked && downLocked))
         {
-            // try to expand left
-            if (Map.CheckArea(xPos - 1,
-                    yPos - (upOffset + 1),
-                    xPos - 1,
-                    yPos + downOffset + 1,
-                    BlockType.Empty))
-                leftOffset++; // TODO: can this be done instantly?
+            // expand left
+            if (Map.CheckArea(x1 - 1, y1, x2, y2, BlockType.Empty))
+                x1--;
             else
                 leftLocked = true;
-            Debug.Log($"left: {leftOffset} {leftLocked}");
 
-            // try to expand top
-            if (Map.CheckArea(xPos - (leftOffset + 1),
-                    yPos - 1,
-                    xPos + rightOffset + 1,
-                    yPos - 1,
-                    BlockType.Empty))
-                upOffset++;
+            // expand up
+            if (Map.CheckArea(x1, y1, x2, y2 + 1, BlockType.Empty))
+                y2++;
             else
                 upLocked = true;
 
-            Debug.Log($"up: {upOffset} {upLocked}");
-
-            // try to expand right 
-            if (Map.CheckArea(xPos + 1,
-                    yPos - (upOffset + 1),
-                    xPos + 1,
-                    yPos + downOffset + 1,
-                    BlockType.Empty))
-                rightOffset++;
+            // expand right
+            if (Map.CheckArea(x1, y1, x2 + 1, y2, BlockType.Empty))
+                x2++;
             else
                 rightLocked = true;
 
-            Debug.Log($"right: {rightOffset} {rightLocked}");
-
-            // try to expand down 
-            if (Map.CheckArea(xPos - (leftOffset + 1),
-                    yPos + 1,
-                    xPos + rightOffset + 1,
-                    yPos + 1,
-                    BlockType.Empty))
-                downOffset++;
+            // expand down 
+            if (Map.CheckArea(x1, y1 - 1, x2, y2, BlockType.Empty))
+                y1--;
             else
                 downLocked = true;
 
-            Debug.Log($"down: {downOffset} {downLocked}");
-
-            Debug.Break();
+            Debug.Log($"{x1},{y1} - {x2},{y2} ");
         }
+
+        return (x1, y1, x2, y2);
+    }
+
+
+    public void PlaceObstacle()
+    {
+        // get random empty point
+        var (xPos, yPos) = _rndGen.GetRandomPositionWithType(Map, BlockType.Empty);
+        Debug.Log($"found valid position at {xPos},{yPos}");
+
+        // fill area around point
+        var (x1, y1, x2, y2) = GetFloodFillArea(xPos, yPos);
+
+        x1 += 2;
+        y1 += 2;
+        x2 -= 2;
+        y2 -= 2;
+
+        // check if area fulfills certain criteria for obstacles
+        var areaWidth = x2 - x1;
+        var areaHeight = y2 - y1;
+        var area = areaWidth * areaHeight;
+        Debug.Log($"{areaWidth}, {areaHeight}, {area}");
+        if (areaWidth >= 2 && areaHeight >= 2 && area > 30)
+        {
+            Debug.Log("valid!");
+            var maxRectSize = 5;
+            var width = _rndGen.Rnd.Next(1, Math.Min(areaWidth + 1, maxRectSize));
+            var height = _rndGen.Rnd.Next(1, Math.Min(areaHeight + 1, maxRectSize));
+            Debug.Log(width);
+            Debug.Log(height);
+
+            var x = _rndGen.Rnd.Next(areaWidth - width);
+            var y = _rndGen.Rnd.Next(areaHeight - height);
+            Debug.Log($"{x},{y} - width:{width}, height:{height}");
+
+            Map.FillArea(x1 + x, y1 + y, x1 + x + width, y1 + y + height, BlockType.Obstacle);
+        }
+
+        // Map.FillArea(x1, y1, x2, y2, BlockType.Freeze);
+        // Map[xPos, yPos] = BlockType.Obstacle;
     }
 }

@@ -57,8 +57,12 @@ public class GridRenderer : MonoBehaviour
                     _generating = false;
                     Debug.Log($"finished with {_currentIteration} iterations");
                     GridDisplay.DisplayGrid(MapGen.Map);
-                    MapGen.PlaceObstacle();
-                    GridDisplay.DisplayGrid(MapGen.Map);
+                    for (var l = 0; l < 1000; l++)
+                    {
+                        MapGen.PlaceObstacle();
+                        GridDisplay.DisplayGrid(MapGen.Map);
+                    }
+
                     break;
                 }
             }
