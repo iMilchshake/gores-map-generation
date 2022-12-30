@@ -33,4 +33,15 @@ public class RandomGenerator
 
         throw new Exception("no move was picked"); // this shouldn't happen lol
     }
+
+    public bool RandomBool(float probability)
+    {
+        return (float)_rnd.NextDouble() <= probability;
+    }
+
+    public T RandomChoice<T>(T[] array)
+    {
+        var index = _rnd.Next(array.Length);
+        return array[index];
+    }
 }

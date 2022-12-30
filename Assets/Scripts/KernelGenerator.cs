@@ -1,6 +1,6 @@
 ﻿using System;
 
-public class KernelGenerator
+public abstract class KernelGenerator
 {
     public static bool[,] GetCircularKernel(int size, float circularity)
     {

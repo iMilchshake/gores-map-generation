@@ -265,9 +265,11 @@ MonoBehaviour:
   maxIterations: 5000
   mapHeight: 100
   mapWidth: 300
-  bestMoveProbability: 0.075
-  kernelSize: 5
-  kernelCircularity: 0.5
+  bestMoveProbability: 0.04
+  kernelSize: 3
+  kernelCircularity: 0
+  kernelSizeChangeProb: 0.01
+  kernelCircularityChangeProb: 0.05
 --- !u!4 &714146207
 Transform:
   m_ObjectHideFlags: 0

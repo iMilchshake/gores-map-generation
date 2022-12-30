@@ -153,6 +153,11 @@ public class MapGenerator
     public Vector2Int WalkerPos;
     public Vector2Int WalkerTargetPos;
     private float _bestMoveProbability;
+    private float _kernelSizeChangeProb;
+    private float _kernelCircularityChangeProb;
+
+    private int _kernelSize;
+    private float _kernelCircularity;
     private bool[,] _kernel;
 
     public MapGenerator(int seed, int width, int height)
@@ -164,13 +169,19 @@ public class MapGenerator
     }
 
     public void Setup(Vector2Int startPos, Vector2Int targetPos, float bestMoveProbability, int kernelSize,
-        float kernelCircularity)
+        float kernelCircularity, float kernelSizeChangeProb, float kernelCircularityChangeProb)
     {
         WalkerPos = startPos;
         WalkerTargetPos = targetPos;
         _bestMoveProbability = bestMoveProbability;
+        _kernelSizeChangeProb = kernelSizeChangeProb;
+        _kernelCircularityChangeProb = kernelCircularityChangeProb;
+
         Map = new Map(_width, _height);
-        _kernel = KernelGenerator.GetCircularKernel(kernelSize, kernelCircularity);
+
+        _kernelSize = kernelSize;
+        _kernelCircularity = kernelCircularity;
+        _kernel = KernelGenerator.GetCircularKernel(_kernelSize, _kernelCircularity);
     }
 
 
@@ -182,6 +193,7 @@ public class MapGenerator
 
         // move walker by picked move and remove tiles using a given kernel
         WalkerPos += pickedMove;
+        UpdateKernel();
         SetBlocks(_kernel, BlockType.Empty);
     }
 
@@ -219,6 +231,26 @@ public class MapGenerator
                 if (kernel[x, y])
                     Map[WalkerPos.x + (x - kernelOffset), WalkerPos.y + (y - kernelOffset)] = type;
             }
+        }
+    }
+
+    private void UpdateKernel()
+    {
+        var updateSize = _rndGen.RandomBool(_kernelSizeChangeProb);
+        var updateCircularity = _rndGen.RandomBool(_kernelCircularityChangeProb);
+
+        if (updateSize)
+            _kernelSize = _rndGen.RandomChoice(new[] { 3, 3, 3, 3, 3, 5, 5, 5, 9 });
+
+        if (updateCircularity)
+            _kernelCircularity = _rndGen.RandomChoice(new[] { 0.0f, 0.3f, 0.7f });
+
+        if (updateSize || updateCircularity)
+        {
+            if (_kernelSize == 3)
+                _kernelCircularity = 0.0f; // circularity doesnt really make sense for a 3x3 kernel
+
+            _kernel = KernelGenerator.GetCircularKernel(_kernelSize, _kernelCircularity);
         }
     }
 }

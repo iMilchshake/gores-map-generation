@@ -13,6 +13,8 @@ public class GridRenderer : MonoBehaviour
     public float bestMoveProbability;
     public int kernelSize;
     public float kernelCircularity;
+    public float kernelSizeChangeProb;
+    public float kernelCircularityChangeProb;
 
     private bool _generating = false;
     private int _currentIteration = 0;
@@ -45,6 +47,7 @@ public class GridRenderer : MonoBehaviour
                 {
                     _generating = false;
                     GridDisplay.DisplayGrid(MapGen.Map);
+                    Debug.Log($"finished with {_currentIteration} iterations");
                     break;
                 }
             }
@@ -60,7 +63,9 @@ public class GridRenderer : MonoBehaviour
             new Vector2Int(mapWidth - 25, mapHeight / 2),
             bestMoveProbability,
             kernelSize,
-            kernelCircularity);
+            kernelCircularity,
+            kernelSizeChangeProb,
+            kernelCircularityChangeProb);
         _generating = true;
         _currentIteration = 0;
     }
