@@ -44,4 +44,9 @@ public class RandomGenerator
         var index = _rnd.Next(array.Length);
         return array[index];
     }
+
+    public (int, int) GetRandomPosition(Map map)
+    {
+        return (_rnd.Next(map.width), _rnd.Next(map.height));
+    }
 }

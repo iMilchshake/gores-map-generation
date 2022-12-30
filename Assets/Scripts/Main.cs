@@ -1,26 +1,25 @@
 using UnityEngine;
+using Random = System.Random;
 
 public class GridRenderer : MonoBehaviour
 {
     public GameObject squarePrefab;
     public MapGenerator MapGen;
     public GridDisplay GridDisplay;
+    public Random SeedGenerator;
 
-    [Header("Rendering Config")] 
-    public Color hookableColor;
+    [Header("Rendering Config")] public Color hookableColor;
     public Color unhookableColor;
     public Color freezeColor;
     public Color emptyColor;
     public Color obstacleColor;
-    
-    [Header("Generation Config")] 
-    public int iterationsPerUpdate;
+
+    [Header("Generation Config")] public int iterationsPerUpdate;
     public int maxIterations;
     public int mapHeight;
     public int mapWidth;
-    
-    [Header("Random Walker Config")] 
-    public float bestMoveProbability;
+
+    [Header("Random Walker Config")] public float bestMoveProbability;
     public float kernelSizeChangeProb;
     public float kernelCircularityChangeProb;
 
@@ -32,11 +31,10 @@ public class GridRenderer : MonoBehaviour
     void Start()
     {
         // generate map
-        MapGen = new MapGenerator(42, mapWidth, mapHeight);
         GridDisplay = new GridDisplay(squarePrefab, hookableColor, unhookableColor, freezeColor, emptyColor,
             obstacleColor);
-        GridDisplay.DisplayGrid(MapGen.Map);
-
+        GridDisplay.DisplayGrid(new Map(mapWidth, mapHeight)); // display empty map so tiles are initialized TODO: lol
+        SeedGenerator = new Random(42);
         StartGeneration();
     }
 
@@ -70,13 +68,16 @@ public class GridRenderer : MonoBehaviour
 
     private void StartGeneration()
     {
-        MapGen.Setup(new Vector2Int(25, mapHeight / 2),
+        MapGen = new MapGenerator(mapWidth, mapHeight,
+            new Vector2Int(25, mapHeight / 2),
             new Vector2Int(mapWidth - 25, mapHeight / 2),
             bestMoveProbability,
             _kernelSize,
             _kernelCircularity,
             kernelSizeChangeProb,
-            kernelCircularityChangeProb);
+            kernelCircularityChangeProb,
+            seed: SeedGenerator.Next()
+        );
         _generating = true;
         _currentIteration = 0;
     }

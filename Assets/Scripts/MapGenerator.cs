@@ -148,7 +148,7 @@ public class MapGenerator
     public Map Map;
     private readonly int _width;
     private readonly int _height;
-    private readonly RandomGenerator _rndGen;
+    private RandomGenerator _rndGen = new(0);
 
     public Vector2Int WalkerPos;
     public Vector2Int WalkerTargetPos;
@@ -160,30 +160,25 @@ public class MapGenerator
     private float _kernelCircularity;
     private bool[,] _kernel;
 
-    public MapGenerator(int seed, int width, int height)
-    {
-        _rndGen = new RandomGenerator(seed);
-        _width = width;
-        _height = height;
-        Map = new Map(width, height);
-    }
 
-    public void Setup(Vector2Int startPos, Vector2Int targetPos, float bestMoveProbability, int kernelSize,
-        float kernelCircularity, float kernelSizeChangeProb, float kernelCircularityChangeProb)
+    public MapGenerator(int width, int height, Vector2Int startPos, Vector2Int targetPos, float bestMoveProbability,
+        int kernelSize, float kernelCircularity, float kernelSizeChangeProb, float kernelCircularityChangeProb,
+        int seed)
     {
         WalkerPos = startPos;
         WalkerTargetPos = targetPos;
+        Map = new Map(width, height);
+
         _bestMoveProbability = bestMoveProbability;
         _kernelSizeChangeProb = kernelSizeChangeProb;
         _kernelCircularityChangeProb = kernelCircularityChangeProb;
-
-        Map = new Map(_width, _height);
-
+        _width = width;
+        _height = height;
+        _rndGen = new RandomGenerator(seed);
         _kernelSize = kernelSize;
         _kernelCircularity = kernelCircularity;
         _kernel = KernelGenerator.GetCircularKernel(_kernelSize, _kernelCircularity);
     }
-
 
     public void Step()
     {
