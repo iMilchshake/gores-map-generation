@@ -185,7 +185,7 @@ public class MapGenerator
         var validMoves = probabilities.GetAllValidMoves();
         float[] moveDistances = new float[moveSize * moveSize];
 
-        // calculate distances for each possbible move
+        // calculate distances for each possible move
         for (int moveIndex = 0; moveIndex < moveSize * moveSize; moveIndex++)
         {
             float dist = Vector2Int.Distance(WalkerTargetPos, WalkerPos + validMoves[moveIndex]);
@@ -193,11 +193,7 @@ public class MapGenerator
         }
 
         // sort moves by their respective distance to the goal
-        // Debug.Log(String.Join(",", validMoves));
         Array.Sort(moveDistances, validMoves);
-        // Debug.Log(String.Join(",", validMoves));
-
-        // Debug.Log(probabilities);
 
         // assign each move a probability based on their index in the sorted order
         for (int moveIndex = 0; moveIndex < moveSize * moveSize; moveIndex++)
@@ -206,21 +202,25 @@ public class MapGenerator
             probabilities[move] = (float)MathUtil.GeometricDistribution(moveIndex + 1, BestMoveProbability);
         }
 
-        // Debug.Log(probabilities);
-        probabilities.Normalize();
-        // Debug.Log(probabilities);
+        probabilities.Normalize(); // normalize the probabilities so that they sum up to 1
 
+        // pick a random move with respect to the calculated probabilities
         var pickedMove = _rndGen.PickRandomMove(probabilities);
-        // Debug.Log(pickedMove);
         WalkerPos += pickedMove;
-        // Debug.Log(WalkerPos);
+        SetBlocks(KernelGenerator.GetRectangleKernel(3));
+    }
 
-        // TODO: this is dirty af
-        for (int x = -1; x <= 1; x++)
+    private void SetBlocks(bool[,] kernel)
+    {
+        var kernelOffset = (kernel.GetLength(0) - 1) / 2;
+        var kernelSize = kernel.GetLength(0);
+
+        for (var x = 0; x < kernelSize; x++)
         {
-            for (int y = -1; y <= 1; y++)
+            for (var y = 0; y < kernelSize; y++)
             {
-                Map[WalkerPos.x + x, WalkerPos.y + y] = BlockType.Empty;
+                if (kernel[x, y])
+                    Map[WalkerPos.x + (x - kernelOffset), WalkerPos.y + (y - kernelOffset)] = BlockType.Empty;
             }
         }
     }

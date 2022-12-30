@@ -7,7 +7,7 @@ public class GridRenderer : MonoBehaviour
     public GridDisplay GridDisplay;
 
     public int iterationsPerUpdate;
-    public int iterations;
+    public int maxIterations;
     public int mapHeight;
     public int mapWidth;
     public float bestMoveProbability;
@@ -39,7 +39,7 @@ public class GridRenderer : MonoBehaviour
                 MapGen.Step();
                 _currentIteration++;
 
-                if (_currentIteration > iterations)
+                if (_currentIteration > maxIterations || MapGen.WalkerPos.Equals(MapGen.WalkerTargetPos))
                 {
                     _generating = false;
                     GridDisplay.DisplayGrid(MapGen.Map);
