@@ -11,6 +11,8 @@ public class GridRenderer : MonoBehaviour
     public int mapHeight;
     public int mapWidth;
     public float bestMoveProbability;
+    public int kernelSize;
+    public float kernelCircularity;
 
     private bool _generating = false;
     private int _currentIteration = 0;
@@ -56,7 +58,9 @@ public class GridRenderer : MonoBehaviour
     {
         MapGen.Setup(new Vector2Int(25, mapHeight / 2),
             new Vector2Int(mapWidth - 25, mapHeight / 2),
-            bestMoveProbability);
+            bestMoveProbability,
+            kernelSize,
+            kernelCircularity);
         _generating = true;
         _currentIteration = 0;
     }

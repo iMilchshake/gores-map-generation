@@ -153,6 +153,7 @@ public class MapGenerator
     public Vector2Int WalkerPos;
     public Vector2Int WalkerTargetPos;
     public float BestMoveProbability;
+    public bool[,] Kernel;
 
     public MapGenerator(int seed, int width, int height)
     {
@@ -162,12 +163,14 @@ public class MapGenerator
         Map = new Map(width, height);
     }
 
-    public void Setup(Vector2Int startPos, Vector2Int targetPos, float bestMoveProbability)
+    public void Setup(Vector2Int startPos, Vector2Int targetPos, float bestMoveProbability, int kernelSize,
+        float kernelCircularity)
     {
         WalkerPos = startPos;
         WalkerTargetPos = targetPos;
         BestMoveProbability = bestMoveProbability;
         Map = new Map(_width, _height);
+        Kernel = KernelGenerator.GetCircularKernel(kernelSize, kernelCircularity);
     }
 
     public Map GenerateMap(int iterationCount)
@@ -207,7 +210,7 @@ public class MapGenerator
         // pick a random move with respect to the calculated probabilities
         var pickedMove = _rndGen.PickRandomMove(probabilities);
         WalkerPos += pickedMove;
-        SetBlocks(KernelGenerator.GetRectangleKernel(3));
+        SetBlocks(Kernel);
     }
 
     private void SetBlocks(bool[,] kernel)
