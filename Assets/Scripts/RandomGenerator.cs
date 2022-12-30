@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Random = System.Random;
 
@@ -17,6 +18,19 @@ public class RandomGenerator
 
     public Vector2Int PickRandomMove(MoveArray moves)
     {
-        return Vector2Int.zero;
+        var probabilitySum = moves.Sum(); // could be something other than 1
+
+        var pickedRandomValue = _rnd.NextDouble() * probabilitySum;
+        var currentValueSum = 0f;
+        foreach (var move in moves.GetAllValidMoves())
+        {
+            currentValueSum += moves[move]; // add current probability
+            if (currentValueSum >= pickedRandomValue)
+            {
+                return move; // picked value was surpassed, return current move
+            }
+        }
+
+        throw new Exception("no move was picked"); // this shouldn't happen lol
     }
 }

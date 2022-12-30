@@ -163,8 +163,8 @@ public class MapGenerator
 
     public void Initialize()
     {
-        WalkerPos = new Vector2Int(_width / 2, _height / 2);
-        WalkerTargetPos = new Vector2Int(95, _height / 2);
+        WalkerPos = new Vector2Int(25, _height / 2);
+        WalkerTargetPos = new Vector2Int(175, _height / 2);
 
         Map = new Map(_width, _height);
     }
@@ -195,30 +195,35 @@ public class MapGenerator
         }
 
         // sort moves by their respective distance to the goal
-        Debug.Log(String.Join(",", validMoves));
+        // Debug.Log(String.Join(",", validMoves));
         Array.Sort(moveDistances, validMoves);
-        Debug.Log(String.Join(",", validMoves));
+        // Debug.Log(String.Join(",", validMoves));
 
-        Debug.Log(probabilities);
+        // Debug.Log(probabilities);
 
         // assign each move a probability based on their index in the sorted order
         for (int moveIndex = 0; moveIndex < moveSize * moveSize; moveIndex++)
         {
             var move = validMoves[moveIndex];
-            probabilities[move] = (float)MathUtil.GeometricDistribution(moveIndex + 1, 0.2f);
+            probabilities[move] = (float)MathUtil.GeometricDistribution(moveIndex + 1, 0.075f);
         }
 
-        Debug.Log(probabilities);
+        // Debug.Log(probabilities);
         probabilities.Normalize();
-        Debug.Log(probabilities);
+        // Debug.Log(probabilities);
 
-        // assign each move a probability based on their index in the sorted order
-        for (int moveIndex = 0; moveIndex < moveSize * moveSize; moveIndex++)
+        var pickedMove = _rndGen.PickRandomMove(probabilities);
+        // Debug.Log(pickedMove);
+        WalkerPos += pickedMove;
+        // Debug.Log(WalkerPos);
+
+        // TODO: this is dirty af
+        for (int x = -1; x <= 1; x++)
         {
-            var move = validMoves[moveIndex];
+            for (int y = -1; y <= 1; y++)
+            {
+                Map[WalkerPos.x + x, WalkerPos.y + y] = BlockType.Empty;
+            }
         }
-
-        WalkerPos += _rndGen.GetRandomDirectionVector();
-        Map[WalkerPos.x, WalkerPos.y] = BlockType.Empty;
     }
 }

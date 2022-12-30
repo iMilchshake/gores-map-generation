@@ -59,7 +59,6 @@ public class GridDisplay
                 // check if type of current tile changed, if yes update display
                 if (_currentMap[x, y] != map[x, y])
                 {
-                    Debug.Log($"[GridDisplay] Update: ({x},{y}) {_currentMap[x, y]} -> {map[x, y]}");
                     UpdateTileColor(_gridDisplayTiles[x, y], map[x, y]);
                 }
             }
