@@ -46,7 +46,7 @@ public class MoveArray
     public MoveArray(int size)
     {
         _values = new float[size, size];
-        this._size = size;
+        _size = size;
     }
 
     public float this[int x, int y]
@@ -64,17 +64,17 @@ public class MoveArray
     private int MoveIndexToArrayIndex(int x)
     {
         // since _probabilities is squared, this function works for x and y
-        int centerX = (_size - 1) / 2;
+        var centerX = (_size - 1) / 2;
         return centerX + x;
     }
 
     public Vector2Int[] GetAllValidMoves()
     {
-        Vector2Int[] validMoves = new Vector2Int[_size * _size];
-        int index = 0;
-        for (int x = 0; x < _size; x++)
+        var validMoves = new Vector2Int[_size * _size];
+        var index = 0;
+        for (var x = 0; x < _size; x++)
         {
-            for (int y = 0; y < _size; y++)
+            for (var y = 0; y < _size; y++)
             {
                 validMoves[index] = new Vector2Int(x - (_size - 1) / 2, y - (_size - 1) / 2);
                 index++;
@@ -86,10 +86,10 @@ public class MoveArray
 
     public void Normalize()
     {
-        float sum = Sum();
-        for (int x = 0; x < _size; x++)
+        var sum = Sum();
+        for (var x = 0; x < _size; x++)
         {
-            for (int y = 0; y < _size; y++)
+            for (var y = 0; y < _size; y++)
             {
                 _values[x, y] /= sum;
             }
@@ -98,10 +98,10 @@ public class MoveArray
 
     public float MaxValue()
     {
-        float maxValue = float.MinValue;
-        for (int x = 0; x < _size; x++)
+        var maxValue = float.MinValue;
+        for (var x = 0; x < _size; x++)
         {
-            for (int y = 0; y < _size; y++)
+            for (var y = 0; y < _size; y++)
             {
                 if (_values[x, y] > maxValue)
                     maxValue = _values[x, y];
@@ -114,9 +114,9 @@ public class MoveArray
     public float Sum()
     {
         float sum = 0;
-        for (int x = 0; x < _size; x++)
+        for (var x = 0; x < _size; x++)
         {
-            for (int y = 0; y < _size; y++)
+            for (var y = 0; y < _size; y++)
             {
                 sum += _values[x, y];
             }
@@ -129,9 +129,9 @@ public class MoveArray
     {
         var strOut = "";
 
-        for (int y = 0; y < _size; y++)
+        for (var y = 0; y < _size; y++)
         {
-            for (int x = 0; x < _size - 1; x++)
+            for (var x = 0; x < _size - 1; x++)
             {
                 strOut += _values[x, y].ToString("0.00") + ",";
             }
@@ -146,14 +146,14 @@ public class MoveArray
 public class MapGenerator
 {
     public Map Map;
-    private int _width;
-    private int _height;
-    private RandomGenerator _rndGen;
+    private readonly int _width;
+    private readonly int _height;
+    private readonly RandomGenerator _rndGen;
 
     public Vector2Int WalkerPos;
     public Vector2Int WalkerTargetPos;
-    public float BestMoveProbability;
-    public bool[,] Kernel;
+    private float _bestMoveProbability;
+    private bool[,] _kernel;
 
     public MapGenerator(int seed, int width, int height)
     {
@@ -168,52 +168,46 @@ public class MapGenerator
     {
         WalkerPos = startPos;
         WalkerTargetPos = targetPos;
-        BestMoveProbability = bestMoveProbability;
+        _bestMoveProbability = bestMoveProbability;
         Map = new Map(_width, _height);
-        Kernel = KernelGenerator.GetCircularKernel(kernelSize, kernelCircularity);
+        _kernel = KernelGenerator.GetCircularKernel(kernelSize, kernelCircularity);
     }
 
-    public Map GenerateMap(int iterationCount)
-    {
-        for (var iteration = 0; iteration < iterationCount; iteration++)
-            Step();
-
-        return Map;
-    }
 
     public void Step()
     {
-        int moveSize = 3;
-        MoveArray probabilities = new MoveArray(moveSize);
+        // pick a random move based on the distance towards the current target position 
+        var distanceProbabilities = GetDistanceProbabilities(3);
+        var pickedMove = _rndGen.PickRandomMove(distanceProbabilities);
+
+        // move walker by picked move and remove tiles using a given kernel
+        WalkerPos += pickedMove;
+        SetBlocks(_kernel, BlockType.Empty);
+    }
+
+    private MoveArray GetDistanceProbabilities(int moveSize)
+    {
+        var moveCount = moveSize * moveSize;
+        var probabilities = new MoveArray(moveSize);
         var validMoves = probabilities.GetAllValidMoves();
-        float[] moveDistances = new float[moveSize * moveSize];
 
         // calculate distances for each possible move
-        for (int moveIndex = 0; moveIndex < moveSize * moveSize; moveIndex++)
-        {
-            float dist = Vector2Int.Distance(WalkerTargetPos, WalkerPos + validMoves[moveIndex]);
-            moveDistances[moveIndex] = dist;
-        }
+        var moveDistances = new float[moveCount];
+        for (var moveIndex = 0; moveIndex < moveCount; moveIndex++)
+            moveDistances[moveIndex] = Vector2Int.Distance(WalkerTargetPos, WalkerPos + validMoves[moveIndex]);
 
         // sort moves by their respective distance to the goal
         Array.Sort(moveDistances, validMoves);
 
         // assign each move a probability based on their index in the sorted order
-        for (int moveIndex = 0; moveIndex < moveSize * moveSize; moveIndex++)
-        {
-            var move = validMoves[moveIndex];
-            probabilities[move] = (float)MathUtil.GeometricDistribution(moveIndex + 1, BestMoveProbability);
-        }
-
+        for (var moveIndex = 0; moveIndex < moveCount; moveIndex++)
+            probabilities[validMoves[moveIndex]] = MathUtil.GeometricDistribution(moveIndex + 1, _bestMoveProbability);
         probabilities.Normalize(); // normalize the probabilities so that they sum up to 1
 
-        // pick a random move with respect to the calculated probabilities
-        var pickedMove = _rndGen.PickRandomMove(probabilities);
-        WalkerPos += pickedMove;
-        SetBlocks(Kernel);
+        return probabilities;
     }
 
-    private void SetBlocks(bool[,] kernel)
+    private void SetBlocks(bool[,] kernel, BlockType type)
     {
         var kernelOffset = (kernel.GetLength(0) - 1) / 2;
         var kernelSize = kernel.GetLength(0);
@@ -223,7 +217,7 @@ public class MapGenerator
             for (var y = 0; y < kernelSize; y++)
             {
                 if (kernel[x, y])
-                    Map[WalkerPos.x + (x - kernelOffset), WalkerPos.y + (y - kernelOffset)] = BlockType.Empty;
+                    Map[WalkerPos.x + (x - kernelOffset), WalkerPos.y + (y - kernelOffset)] = type;
             }
         }
     }
