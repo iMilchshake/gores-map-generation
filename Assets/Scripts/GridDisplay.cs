@@ -4,21 +4,28 @@ using Object = UnityEngine.Object;
 
 public class GridDisplay
 {
-    // define some colors TODO: move this somewhere else
-    public Color HookableColor = new(1f, 0.86f, 0.27f);
-    public Color UnhookableColor = new(0.29f, 0.45f, 0.5f);
-    public Color FreezeColor = new(0.01f, 0f, 0.02f);
-    public Color EmptyColor = new(1.0f, 1.0f, 1.0f, 0.1f);
-
     private readonly GameObject _squarePrefab; // this is also really stupid
     private GridTile[,] _gridDisplayTiles; // keeps track of initiated tiles
     private Map _currentMap; // map that is currently displayed
     private readonly GameObject _tileParentObject; // parent object to group all displayed tiles together
 
-    public GridDisplay(GameObject squarePrefab)
+    private readonly Color _hookableColor;
+    private readonly Color _unhookableColor;
+    private readonly Color _freezeColor;
+    private readonly Color _emptyColor;
+    private readonly Color _obstacleColor;
+
+    public GridDisplay(GameObject squarePrefab, Color hookableColor, Color unhookableColor, Color freezeColor,
+        Color emptyColor, Color obstacleColor)
     {
         _squarePrefab = squarePrefab;
         _tileParentObject = new GameObject("Tiles");
+
+        _hookableColor = hookableColor;
+        _unhookableColor = unhookableColor;
+        _freezeColor = freezeColor;
+        _emptyColor = emptyColor;
+        _obstacleColor = obstacleColor;
     }
 
     public void ClearDisplay()
@@ -103,11 +110,12 @@ public class GridDisplay
     {
         tile.SpriteRenderer.color = type switch
         {
-            BlockType.Freeze => FreezeColor,
-            BlockType.Unhookable => UnhookableColor,
-            BlockType.Hookable => HookableColor,
-            BlockType.Empty => EmptyColor,
-            _ => EmptyColor
+            BlockType.Freeze => _freezeColor,
+            BlockType.Unhookable => _unhookableColor,
+            BlockType.Hookable => _hookableColor,
+            BlockType.Empty => _emptyColor,
+            BlockType.Obstacle => _obstacleColor,
+            _ => _emptyColor
         };
     }
 }

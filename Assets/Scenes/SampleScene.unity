@@ -261,13 +261,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   squarePrefab: {fileID: 5170055426446278379, guid: 21033ef0d2d54fc4a828486127ded13a, type: 3}
-  iterationsPerUpdate: 1
+  hookableColor: {r: 0.8113208, g: 0.6697224, b: 0.38652548, a: 1}
+  unhookableColor: {r: 0.29, g: 0.45, b: 0.5, a: 1}
+  freezeColor: {r: 0.01, g: 0, b: 0.05, a: 0.5}
+  emptyColor: {r: 1, g: 1, b: 1, a: 0.1}
+  obstacleColor: {r: 0.43916875, g: 0.6698113, b: 0.43916875, a: 1}
+  iterationsPerUpdate: 5000
   maxIterations: 5000
   mapHeight: 100
   mapWidth: 300
   bestMoveProbability: 0.04
-  kernelSize: 3
-  kernelCircularity: 0
   kernelSizeChangeProb: 0.01
   kernelCircularityChangeProb: 0.05
 --- !u!4 &714146207

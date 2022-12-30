@@ -3,5 +3,6 @@
     Hookable,
     Unhookable,
     Freeze,
-    Empty
+    Empty,
+    Obstacle
 }
