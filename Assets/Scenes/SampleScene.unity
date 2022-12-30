@@ -262,7 +262,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   squarePrefab: {fileID: 5170055426446278379, guid: 21033ef0d2d54fc4a828486127ded13a, type: 3}
   iterationsPerUpdate: 50
-  iterations: 1250
+  iterations: 2000
+  mapHeight: 100
+  mapWidth: 400
+  bestMoveProbability: 0.075
 --- !u!4 &714146207
 Transform:
   m_ObjectHideFlags: 0

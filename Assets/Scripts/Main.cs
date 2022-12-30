@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class GridRenderer : MonoBehaviour
@@ -6,8 +5,12 @@ public class GridRenderer : MonoBehaviour
     public GameObject squarePrefab;
     public MapGenerator MapGen;
     public GridDisplay GridDisplay;
+
     public int iterationsPerUpdate;
     public int iterations;
+    public int mapHeight;
+    public int mapWidth;
+    public float bestMoveProbability;
 
     private bool _generating = false;
     private int _currentIteration = 0;
@@ -15,9 +18,10 @@ public class GridRenderer : MonoBehaviour
     void Start()
     {
         // generate map
-        MapGen = new MapGenerator(42, 200, 50);
+        MapGen = new MapGenerator(42, mapWidth, mapHeight);
         GridDisplay = new GridDisplay(squarePrefab);
         GridDisplay.DisplayGrid(MapGen.Map);
+
         StartGeneration();
     }
 
@@ -50,7 +54,9 @@ public class GridRenderer : MonoBehaviour
 
     private void StartGeneration()
     {
-        MapGen.Initialize();
+        MapGen.Setup(new Vector2Int(25, mapHeight / 2),
+            new Vector2Int(mapWidth - 25, mapHeight / 2),
+            bestMoveProbability);
         _generating = true;
         _currentIteration = 0;
     }

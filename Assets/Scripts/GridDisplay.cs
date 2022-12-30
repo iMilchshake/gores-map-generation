@@ -13,10 +13,12 @@ public class GridDisplay
     private readonly GameObject _squarePrefab; // this is also really stupid
     private GridTile[,] _gridDisplayTiles; // keeps track of initiated tiles
     private Map _currentMap; // map that is currently displayed
+    private readonly GameObject _tileParentObject; // parent object to group all displayed tiles together
 
     public GridDisplay(GameObject squarePrefab)
     {
         _squarePrefab = squarePrefab;
+        _tileParentObject = new GameObject("Tiles");
     }
 
     public void ClearDisplay()
@@ -45,11 +47,9 @@ public class GridDisplay
             return; // rest can be skipped since initialize function already sets the correct color for tiles 
         }
 
-        // check dimensions of new grid TODO: long if statement, maybe wrap inside a function?
+        // check dimensions of new map
         if (!Map.CheckSameDimension(_currentMap, map))
-        {
             throw new IndexOutOfRangeException("grids have different dimension");
-        }
 
         // update display using new grid
         for (int x = 0; x < map.width; x++)
@@ -89,6 +89,7 @@ public class GridDisplay
     {
         // initialize Unity components
         var square = Object.Instantiate(_squarePrefab, new Vector3(position.x, position.y, 1.0f), Quaternion.identity);
+        square.transform.SetParent(_tileParentObject.transform);
         var render = square.GetComponent<SpriteRenderer>();
 
         // initialize GridTile

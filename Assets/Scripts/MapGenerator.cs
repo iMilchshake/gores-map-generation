@@ -145,37 +145,35 @@ public class MoveArray
 
 public class MapGenerator
 {
-    public Vector2Int WalkerPos;
-    public Vector2Int WalkerTargetPos;
-
     public Map Map;
     private int _width;
     private int _height;
     private RandomGenerator _rndGen;
+
+    public Vector2Int WalkerPos;
+    public Vector2Int WalkerTargetPos;
+    public float BestMoveProbability;
 
     public MapGenerator(int seed, int width, int height)
     {
         _rndGen = new RandomGenerator(seed);
         _width = width;
         _height = height;
-        Initialize();
+        Map = new Map(width, height);
     }
 
-    public void Initialize()
+    public void Setup(Vector2Int startPos, Vector2Int targetPos, float bestMoveProbability)
     {
-        WalkerPos = new Vector2Int(25, _height / 2);
-        WalkerTargetPos = new Vector2Int(175, _height / 2);
-
+        WalkerPos = startPos;
+        WalkerTargetPos = targetPos;
+        BestMoveProbability = bestMoveProbability;
         Map = new Map(_width, _height);
     }
 
     public Map GenerateMap(int iterationCount)
     {
-        Initialize();
         for (var iteration = 0; iteration < iterationCount; iteration++)
-        {
             Step();
-        }
 
         return Map;
     }
@@ -205,7 +203,7 @@ public class MapGenerator
         for (int moveIndex = 0; moveIndex < moveSize * moveSize; moveIndex++)
         {
             var move = validMoves[moveIndex];
-            probabilities[move] = (float)MathUtil.GeometricDistribution(moveIndex + 1, 0.075f);
+            probabilities[move] = (float)MathUtil.GeometricDistribution(moveIndex + 1, BestMoveProbability);
         }
 
         // Debug.Log(probabilities);
