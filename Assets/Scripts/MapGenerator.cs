@@ -36,6 +36,21 @@ public class Map
     {
         return new Map((BlockType[,])grid.Clone());
     }
+
+    // checks if the entire area is filled with the given BlockType
+    public bool CheckArea(int x1, int y1, int x2, int y2, BlockType type)
+    {
+        for (var x = x1; x <= x2; x++)
+        {
+            for (var y = y1; y <= y2; y++)
+            {
+                if (grid[x, y] != type)
+                    return false;
+            }
+        }
+
+        return true;
+    }
 }
 
 public class MoveArray
@@ -246,6 +261,85 @@ public class MapGenerator
                 _kernelCircularity = 0.0f; // circularity doesnt really make sense for a 3x3 kernel
 
             _kernel = KernelGenerator.GetCircularKernel(_kernelSize, _kernelCircularity);
+        }
+    }
+
+    public void PlaceObstacle()
+    {
+        // get random empty point
+        var xPos = 0;
+        var yPos = 0;
+        while (Map[xPos, yPos] != BlockType.Empty)
+        {
+            (xPos, yPos) = _rndGen.GetRandomPosition(Map);
+        }
+
+        // Map[xPos, yPos] = BlockType.Obstacle;
+
+        Debug.Log($"found valid position at {xPos},{yPos}");
+
+        // start expanding area around point
+        var leftLocked = false;
+        var upLocked = false;
+        var rightLocked = false;
+        var downLocked = false;
+
+        var leftOffset = 0;
+        var upOffset = 0;
+        var rightOffset = 0;
+        var downOffset = 0;
+
+        // this approach is fucking stupid wtf
+        while (!(leftLocked && upLocked && rightLocked && downLocked))
+        {
+            // try to expand left
+            if (Map.CheckArea(xPos - 1,
+                    yPos - (upOffset + 1),
+                    xPos - 1,
+                    yPos + downOffset + 1,
+                    BlockType.Empty))
+                leftOffset++; // TODO: can this be done instantly?
+            else
+                leftLocked = true;
+            Debug.Log($"left: {leftOffset} {leftLocked}");
+
+            // try to expand top
+            if (Map.CheckArea(xPos - (leftOffset + 1),
+                    yPos - 1,
+                    xPos + rightOffset + 1,
+                    yPos - 1,
+                    BlockType.Empty))
+                upOffset++;
+            else
+                upLocked = true;
+
+            Debug.Log($"up: {upOffset} {upLocked}");
+
+            // try to expand right 
+            if (Map.CheckArea(xPos + 1,
+                    yPos - (upOffset + 1),
+                    xPos + 1,
+                    yPos + downOffset + 1,
+                    BlockType.Empty))
+                rightOffset++;
+            else
+                rightLocked = true;
+
+            Debug.Log($"right: {rightOffset} {rightLocked}");
+
+            // try to expand down 
+            if (Map.CheckArea(xPos - (leftOffset + 1),
+                    yPos + 1,
+                    xPos + rightOffset + 1,
+                    yPos + 1,
+                    BlockType.Empty))
+                downOffset++;
+            else
+                downLocked = true;
+
+            Debug.Log($"down: {downOffset} {downLocked}");
+
+            Debug.Break();
         }
     }
 }

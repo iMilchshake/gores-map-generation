@@ -55,8 +55,10 @@ public class GridRenderer : MonoBehaviour
                 if (_currentIteration > maxIterations || MapGen.WalkerPos.Equals(MapGen.WalkerTargetPos))
                 {
                     _generating = false;
-                    GridDisplay.DisplayGrid(MapGen.Map);
                     Debug.Log($"finished with {_currentIteration} iterations");
+                    GridDisplay.DisplayGrid(MapGen.Map);
+                    MapGen.PlaceObstacle();
+                    GridDisplay.DisplayGrid(MapGen.Map);
                     break;
                 }
             }
