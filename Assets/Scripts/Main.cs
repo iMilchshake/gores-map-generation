@@ -36,6 +36,13 @@ public class GridRenderer : MonoBehaviour
         GridDisplay.DisplayGrid(new Map(mapWidth, mapHeight)); // display empty map so tiles are initialized TODO: lol
         SeedGenerator = new Random(42);
         StartGeneration();
+
+        var test = new int[11, 11];
+        ArrayUtils.FillArray2D(test, int.MaxValue);
+        test[5, 5] = 0;
+        Debug.Log(ArrayUtils.Array2DToString(test));
+        var testOut = MathUtil.DistanceTransformCityBlock(test);
+        Debug.Log(ArrayUtils.Array2DToString(testOut));
     }
 
 
