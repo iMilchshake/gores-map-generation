@@ -7,12 +7,10 @@ public class MathUtil
         return (float)Math.Pow(1 - p, x - 1) * p;
     }
 
-    public static int[,] DistanceTransformCityBlock(int[,] array)
+    public static void DistanceTransformCityBlock(int[,] distance)
     {
-        var width = array.GetLength(0);
-        var height = array.GetLength(1);
-
-        var distance = (int[,])array.Clone();
+        var width = distance.GetLength(0);
+        var height = distance.GetLength(1);
 
         // forward pass
         for (int x = 0; x < width; x++) // left to right
@@ -41,7 +39,5 @@ public class MathUtil
                     distance[x, y] = newValue;
             }
         }
-
-        return distance;
     }
 }

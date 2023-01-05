@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 public class Map
 {
@@ -35,6 +37,34 @@ public class Map
     public Map Clone()
     {
         return new Map((BlockType[,])grid.Clone());
+    }
+
+    public int[,] GetDistanceMap()
+    {
+        // setup array
+        int[,] distance = new int[grid.GetLength(0), grid.GetLength(1)];
+        for (int x = 0; x < distance.GetLength(0); x++)
+        {
+            for (int y = 0; y < distance.GetLength(1); y++)
+            {
+                if (grid[x, y] != BlockType.Hookable)
+                {
+                    distance[x, y] = int.MaxValue;
+                }
+                // distance[x, y] = grid[x, y] switch
+                // {
+                //     BlockType.Hookable => 0,
+                //     _ => int.MaxValue
+                // };
+            }
+        }
+
+        Debug.Log(ArrayUtils.Array2DToString(distance));
+
+        // calculate distance transform
+        MathUtil.DistanceTransformCityBlock(distance);
+        Debug.Log(ArrayUtils.Array2DToString(distance));
+        return distance;
     }
 }
 
@@ -127,19 +157,7 @@ public class MoveArray
 
     public override String ToString()
     {
-        var strOut = "";
-
-        for (var y = 0; y < _size; y++)
-        {
-            for (var x = 0; x < _size - 1; x++)
-            {
-                strOut += _values[x, y].ToString("0.00") + ",";
-            }
-
-            strOut += _values[_size - 1, y].ToString("0.00") + "\n";
-        }
-
-        return strOut;
+        return ArrayUtils.Array2DToString(_values);
     }
 }
 
@@ -190,6 +208,11 @@ public class MapGenerator
         WalkerPos += pickedMove;
         UpdateKernel();
         SetBlocks(_kernel, BlockType.Empty);
+    }
+
+    public void OnFinish()
+    {
+        FillSpace();
     }
 
     private MoveArray GetDistanceProbabilities(int moveSize)
@@ -246,6 +269,21 @@ public class MapGenerator
                 _kernelCircularity = 0.0f; // circularity doesnt really make sense for a 3x3 kernel
 
             _kernel = KernelGenerator.GetCircularKernel(_kernelSize, _kernelCircularity);
+        }
+    }
+
+    private void FillSpace()
+    {
+        var distances = Map.GetDistanceMap();
+        for (int x = 0; x < distances.GetLength(0); x++)
+        {
+            for (int y = 0; y < distances.GetLength(1); y++)
+            {
+                if (distances[x, y] >= 6)
+                {
+                    Map[x, y] = BlockType.Hookable;
+                }
+            }
         }
     }
 }

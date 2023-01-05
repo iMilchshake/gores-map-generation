@@ -41,8 +41,8 @@ public class GridRenderer : MonoBehaviour
         ArrayUtils.FillArray2D(test, int.MaxValue);
         test[5, 5] = 0;
         Debug.Log(ArrayUtils.Array2DToString(test));
-        var testOut = MathUtil.DistanceTransformCityBlock(test);
-        Debug.Log(ArrayUtils.Array2DToString(testOut));
+        MathUtil.DistanceTransformCityBlock(test);
+        Debug.Log(ArrayUtils.Array2DToString(test));
     }
 
 
@@ -64,6 +64,8 @@ public class GridRenderer : MonoBehaviour
                     _generating = false;
                     GridDisplay.DisplayGrid(MapGen.Map);
                     Debug.Log($"finished with {_currentIteration} iterations");
+                    MapGen.OnFinish();
+                    GridDisplay.DisplayGrid(MapGen.Map);
                     break;
                 }
             }
