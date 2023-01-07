@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 public class Map
 {
@@ -166,7 +164,9 @@ public class MapGenerator
     private RandomGenerator _rndGen = new(0);
 
     public Vector2Int WalkerPos;
-    public Vector2Int WalkerTargetPos;
+    public Vector2Int[] WalkerTargetPositions;
+    public int WalkerTargetPosIndex = 0;
+
     private float _bestMoveProbability;
     private float _kernelSizeChangeProb;
     private float _kernelCircularityChangeProb;
@@ -176,12 +176,13 @@ public class MapGenerator
     private bool[,] _kernel;
 
 
-    public MapGenerator(int width, int height, Vector2Int startPos, Vector2Int targetPos, float bestMoveProbability,
+    public MapGenerator(int width, int height, Vector2Int startPos, Vector2Int[] targetPositions,
+        float bestMoveProbability,
         int kernelSize, float kernelCircularity, float kernelSizeChangeProb, float kernelCircularityChangeProb,
         int seed)
     {
         WalkerPos = startPos;
-        WalkerTargetPos = targetPos;
+        WalkerTargetPositions = targetPositions;
         Map = new Map(width, height);
 
         _bestMoveProbability = bestMoveProbability;
@@ -205,11 +206,23 @@ public class MapGenerator
         WalkerPos += pickedMove;
         UpdateKernel();
         SetBlocks(_kernel, BlockType.Empty);
+
+        // test if current target was reached
+        if (WalkerPos.Equals(GetCurrentTargetPos()) && WalkerTargetPosIndex < WalkerTargetPositions.Length - 1)
+        {
+            Debug.Log($"reached targetPos index={WalkerTargetPosIndex}");
+            WalkerTargetPosIndex++;
+        }
     }
 
     public void OnFinish()
     {
         FillSpace();
+    }
+
+    public Vector2Int GetCurrentTargetPos()
+    {
+        return WalkerTargetPositions[WalkerTargetPosIndex];
     }
 
     private MoveArray GetDistanceProbabilities(int moveSize)
@@ -221,7 +234,8 @@ public class MapGenerator
         // calculate distances for each possible move
         var moveDistances = new float[moveCount];
         for (var moveIndex = 0; moveIndex < moveCount; moveIndex++)
-            moveDistances[moveIndex] = Vector2Int.Distance(WalkerTargetPos, WalkerPos + validMoves[moveIndex]);
+            moveDistances[moveIndex] = Vector2Int.Distance(WalkerTargetPositions[WalkerTargetPosIndex],
+                WalkerPos + validMoves[moveIndex]);
 
         // sort moves by their respective distance to the goal
         Array.Sort(moveDistances, validMoves);

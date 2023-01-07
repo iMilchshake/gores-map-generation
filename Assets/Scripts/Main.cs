@@ -67,7 +67,7 @@ public class Main : MonoBehaviour
 
                 _currentIteration++;
 
-                if (_currentIteration > maxIterations || MapGen.WalkerPos.Equals(MapGen.WalkerTargetPos))
+                if (_currentIteration > maxIterations || MapGen.WalkerPos.Equals(MapGen.GetCurrentTargetPos()))
                 {
                     _generating = false;
                     GridDisplay.DisplayGrid(MapGen.Map);
@@ -89,9 +89,16 @@ public class Main : MonoBehaviour
 
     private void StartGeneration()
     {
+        var margin = 50;
+
         MapGen = new MapGenerator(mapWidth, mapHeight,
-            new Vector2Int(25, mapHeight / 2),
-            new Vector2Int(mapWidth - 25, mapHeight / 2),
+            new Vector2Int(margin, margin),
+            new[]
+            {
+                new Vector2Int(mapWidth - margin, margin),
+                new Vector2Int(mapWidth - margin, mapHeight - margin),
+                new Vector2Int(margin, mapHeight - margin)
+            },
             bestMoveProbability,
             _kernelSize,
             _kernelCircularity,

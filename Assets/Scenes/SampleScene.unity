@@ -185,7 +185,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 50
+  orthographic size: 100
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -209,7 +209,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 50, y: 50, z: 0}
+  m_LocalPosition: {x: 200, y: 75, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -266,10 +266,10 @@ MonoBehaviour:
   freezeColor: {r: 0.01, g: 0, b: 0.05, a: 0.5}
   emptyColor: {r: 1, g: 1, b: 1, a: 0.1}
   obstacleColor: {r: 0.43916875, g: 0.6698113, b: 0.43916875, a: 1}
-  iterationsPerUpdate: 5000
-  maxIterations: 5000
-  mapHeight: 100
-  mapWidth: 300
+  iterationsPerUpdate: 50
+  maxIterations: 6000
+  mapHeight: 150
+  mapWidth: 400
   bestMoveProbability: 0.06
   kernelSizeChangeProb: 0.05
   kernelCircularityChangeProb: 0.05
