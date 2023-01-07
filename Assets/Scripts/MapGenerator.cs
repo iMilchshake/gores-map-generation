@@ -39,16 +39,12 @@ public class Map
 
     public int[,] GetDistanceMap()
     {
-        // setup array
+        // setup distance array 
         int[,] distance = new int[Width, Height];
         for (int x = 0; x < Width; x++)
         {
             for (int y = 0; y < Height; y++)
             {
-                // if (grid[x, y] != BlockType.Hookable)
-                // {
-                //     distance[x, y] = int.MaxValue;
-                // }
                 distance[x, y] = grid[x, y] switch
                 {
                     BlockType.Hookable => 0,
@@ -60,6 +56,35 @@ public class Map
         // calculate distance transform
         MathUtil.DistanceTransformCityBlock(distance);
         return distance;
+    }
+
+    public bool CheckTypeInArea(int x1, int y1, int x2, int y2, BlockType type)
+    {
+        // returns True if type is at least present once in the area
+        for (var x = x1; x <= x2; x++)
+        {
+            for (var y = y1; y <= y2; y++)
+            {
+                if (grid[x, y] == type)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    public BlockType[,] GetCellNeighbors(int xPos, int yPos)
+    {
+        var neighbors = new BlockType[3, 3];
+        for (var xOffset = 0; xOffset <= 2; xOffset++)
+        {
+            for (var yOffset = 0; yOffset <= 2; yOffset++)
+            {
+                neighbors[xOffset, yOffset] = grid[xPos - xOffset - 1, yPos - yOffset - 1];
+            }
+        }
+
+        return neighbors;
     }
 }
 
@@ -217,7 +242,8 @@ public class MapGenerator
 
     public void OnFinish()
     {
-        FillSpace();
+        FillSpaceWithObstacles();
+        GenerateFreeze();
     }
 
     public Vector2Int GetCurrentTargetPos()
@@ -283,7 +309,7 @@ public class MapGenerator
         }
     }
 
-    private void FillSpace()
+    private void FillSpaceWithObstacles()
     {
         var distances = Map.GetDistanceMap();
         var width = distances.GetLength(0);
@@ -294,8 +320,23 @@ public class MapGenerator
             {
                 if (distances[x, y] >= 7)
                 {
-                    Map[x, y] = BlockType.Obstacle;
+                    Map[x, y] = BlockType.Hookable;
                 }
+            }
+        }
+    }
+
+    private void GenerateFreeze()
+    {
+        // iterate over every cell of the map
+        for (var x = 0; x < _width; x++)
+        {
+            for (var y = 0; y < _height; y++)
+            {
+                // if a hookable tile is nearby -> set freeze
+                if (Map[x, y] == BlockType.Empty &&
+                    Map.CheckTypeInArea(x - 1, y - 1, x + 1, y + 1, BlockType.Hookable))
+                    Map[x, y] = BlockType.Freeze;
             }
         }
     }
