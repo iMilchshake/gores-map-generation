@@ -59,9 +59,9 @@ public class GridDisplay
             throw new IndexOutOfRangeException("grids have different dimension");
 
         // update display using new grid
-        for (int x = 0; x < map.width; x++)
+        for (int x = 0; x < map.Width; x++)
         {
-            for (int y = 0; y < map.height; y++)
+            for (int y = 0; y < map.Height; y++)
             {
                 // check if type of current tile changed, if yes update display
                 if (_currentMap[x, y] != map[x, y])
@@ -79,11 +79,11 @@ public class GridDisplay
         if (_gridDisplayTiles != null)
             throw new InvalidOperationException("tiles have already been initialized");
 
-        _gridDisplayTiles = new GridTile[map.width, map.height];
+        _gridDisplayTiles = new GridTile[map.Width, map.Height];
         _currentMap = map;
-        for (int x = 0; x < map.width; x++)
+        for (int x = 0; x < map.Width; x++)
         {
-            for (int y = 0; y < map.height; y++)
+            for (int y = 0; y < map.Height; y++)
             {
                 GridTile tile = InitializeSquare(new Vector2(x, y), map[x, y]);
                 _gridDisplayTiles[x, y] = tile;

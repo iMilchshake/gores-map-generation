@@ -6,21 +6,21 @@ using Debug = UnityEngine.Debug;
 public class Map
 {
     private BlockType[,] grid;
-    public int width;
-    public int height;
+    public int Width;
+    public int Height;
 
     public Map(int width, int height)
     {
         grid = new BlockType[width, height];
-        this.width = width;
-        this.height = height;
+        this.Width = width;
+        this.Height = height;
     }
 
     public Map(BlockType[,] grid)
     {
         this.grid = grid;
-        width = grid.GetLength(0);
-        height = grid.GetLength(1);
+        Width = grid.GetLength(0);
+        Height = grid.GetLength(1);
     }
 
     public BlockType this[int x, int y]
@@ -31,7 +31,7 @@ public class Map
 
     public static bool CheckSameDimension(Map map1, Map map2)
     {
-        return map1.height == map2.height && map1.width == map2.width;
+        return map1.Height == map2.Height && map1.Width == map2.Width;
     }
 
     public Map Clone()
@@ -42,28 +42,25 @@ public class Map
     public int[,] GetDistanceMap()
     {
         // setup array
-        int[,] distance = new int[grid.GetLength(0), grid.GetLength(1)];
-        for (int x = 0; x < distance.GetLength(0); x++)
+        int[,] distance = new int[Width, Height];
+        for (int x = 0; x < Width; x++)
         {
-            for (int y = 0; y < distance.GetLength(1); y++)
+            for (int y = 0; y < Height; y++)
             {
-                if (grid[x, y] != BlockType.Hookable)
-                {
-                    distance[x, y] = int.MaxValue;
-                }
-                // distance[x, y] = grid[x, y] switch
+                // if (grid[x, y] != BlockType.Hookable)
                 // {
-                //     BlockType.Hookable => 0,
-                //     _ => int.MaxValue
-                // };
+                //     distance[x, y] = int.MaxValue;
+                // }
+                distance[x, y] = grid[x, y] switch
+                {
+                    BlockType.Hookable => 0,
+                    _ => int.MaxValue
+                };
             }
         }
 
-        Debug.Log(ArrayUtils.Array2DToString(distance));
-
         // calculate distance transform
         MathUtil.DistanceTransformCityBlock(distance);
-        Debug.Log(ArrayUtils.Array2DToString(distance));
         return distance;
     }
 }
@@ -258,7 +255,7 @@ public class MapGenerator
         var updateCircularity = _rndGen.RandomBool(_kernelCircularityChangeProb);
 
         if (updateSize)
-            _kernelSize = _rndGen.RandomChoice(new[] { 3, 3, 3, 3, 3, 5, 5, 5, 9 });
+            _kernelSize = _rndGen.RandomChoice(new[] { 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 5, 9 });
 
         if (updateCircularity)
             _kernelCircularity = _rndGen.RandomChoice(new[] { 0.0f, 0.3f, 0.7f });
@@ -275,13 +272,15 @@ public class MapGenerator
     private void FillSpace()
     {
         var distances = Map.GetDistanceMap();
-        for (int x = 0; x < distances.GetLength(0); x++)
+        var width = distances.GetLength(0);
+        var height = distances.GetLength(1);
+        for (int x = 0; x < width; x++)
         {
-            for (int y = 0; y < distances.GetLength(1); y++)
+            for (int y = 0; y < height; y++)
             {
-                if (distances[x, y] >= 6)
+                if (distances[x, y] >= 7)
                 {
-                    Map[x, y] = BlockType.Hookable;
+                    Map[x, y] = BlockType.Obstacle;
                 }
             }
         }

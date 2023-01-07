@@ -270,8 +270,8 @@ MonoBehaviour:
   maxIterations: 5000
   mapHeight: 100
   mapWidth: 300
-  bestMoveProbability: 0.04
-  kernelSizeChangeProb: 0.01
+  bestMoveProbability: 0.06
+  kernelSizeChangeProb: 0.05
   kernelCircularityChangeProb: 0.05
 --- !u!4 &714146207
 Transform:

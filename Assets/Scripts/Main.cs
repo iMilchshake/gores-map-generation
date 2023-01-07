@@ -1,7 +1,8 @@
+using Unity.Profiling;
 using UnityEngine;
 using Random = System.Random;
 
-public class GridRenderer : MonoBehaviour
+public class Main : MonoBehaviour
 {
     public GameObject squarePrefab;
     public MapGenerator MapGen;
@@ -28,6 +29,9 @@ public class GridRenderer : MonoBehaviour
     private bool _generating = false;
     private int _currentIteration = 0;
 
+    static readonly ProfilerMarker MarkerMapGenStep = new("MapGeneration.Step");
+    static readonly ProfilerMarker MarkerMapGenFinishStep = new("MapGeneration.FinishStep");
+
     void Start()
     {
         // generate map
@@ -37,12 +41,12 @@ public class GridRenderer : MonoBehaviour
         SeedGenerator = new Random(42);
         StartGeneration();
 
-        var test = new int[11, 11];
-        ArrayUtils.FillArray2D(test, int.MaxValue);
-        test[5, 5] = 0;
-        Debug.Log(ArrayUtils.Array2DToString(test));
-        MathUtil.DistanceTransformCityBlock(test);
-        Debug.Log(ArrayUtils.Array2DToString(test));
+        // var test = new int[11, 11];
+        // ArrayUtils.FillArray2D(test, int.MaxValue);
+        // test[5, 5] = 0;
+        // Debug.Log(ArrayUtils.Array2DToString(test));
+        // MathUtil.DistanceTransformCityBlock(test);
+        // Debug.Log(ArrayUtils.Array2DToString(test));
     }
 
 
@@ -56,7 +60,11 @@ public class GridRenderer : MonoBehaviour
             // do n update steps (n = iterationsPerUpdate)
             for (int i = 0; i < iterationsPerUpdate; i++)
             {
-                MapGen.Step();
+                using (MarkerMapGenStep.Auto())
+                {
+                    MapGen.Step();
+                }
+
                 _currentIteration++;
 
                 if (_currentIteration > maxIterations || MapGen.WalkerPos.Equals(MapGen.WalkerTargetPos))
@@ -64,7 +72,11 @@ public class GridRenderer : MonoBehaviour
                     _generating = false;
                     GridDisplay.DisplayGrid(MapGen.Map);
                     Debug.Log($"finished with {_currentIteration} iterations");
-                    MapGen.OnFinish();
+                    using (MarkerMapGenFinishStep.Auto())
+                    {
+                        MapGen.OnFinish();
+                    }
+
                     GridDisplay.DisplayGrid(MapGen.Map);
                     break;
                 }

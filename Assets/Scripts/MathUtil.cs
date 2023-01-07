@@ -17,6 +17,9 @@ public class MathUtil
         {
             for (int y = height - 1; y >= 0; y--) // top to bottom
             {
+                if (distance[x, y] == 0) // skip this cell if distance is already 0
+                    continue;
+
                 var above = y < (height - 1) ? distance[x, y + 1] : int.MaxValue;
                 var left = x > 0 ? distance[x - 1, y] : int.MaxValue;
                 var best = Math.Min(above, left);
@@ -31,6 +34,9 @@ public class MathUtil
         {
             for (int y = 0; y < height; y++) // bottom to top
             {
+                if (distance[x, y] == 0) // skip this cell if distance is already 0
+                    continue;
+
                 var below = y > 0 ? distance[x, y - 1] : int.MaxValue;
                 var right = x < width - 1 ? distance[x + 1, y] : int.MaxValue;
                 var best = Math.Min(below, right);
