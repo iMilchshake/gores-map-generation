@@ -8,6 +8,10 @@ public class MathUtil
         return (float)Math.Pow(1 - p, x - 1) * p;
     }
 
+    public static bool CheckFloat(float a, float b)
+    {
+        return Math.Abs(a - b) < 1e-5;
+    }
 
     static int Min4(int a, int b, int c, int d)
     {

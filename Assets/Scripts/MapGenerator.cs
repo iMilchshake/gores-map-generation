@@ -27,6 +27,21 @@ public class Map
         set => grid[x, y] = value;
     }
 
+    public void SetBlocks(int xPos, int yPos, bool[,] kernel, BlockType type)
+    {
+        var kernelOffset = (kernel.GetLength(0) - 1) / 2;
+        var kernelSize = kernel.GetLength(0);
+
+        for (var xKernel = 0; xKernel < kernelSize; xKernel++)
+        {
+            for (var yKernel = 0; yKernel < kernelSize; yKernel++)
+            {
+                if (kernel[xKernel, yKernel])
+                    grid[xPos + (xKernel - kernelOffset), yPos + (yKernel - kernelOffset)] = type;
+            }
+        }
+    }
+
     public static bool CheckSameDimension(Map map1, Map map2)
     {
         return map1.Height == map2.Height && map1.Width == map2.Width;
@@ -196,15 +211,14 @@ public class MapGenerator
     private float _kernelSizeChangeProb;
     private float _kernelCircularityChangeProb;
 
-    private int _kernelSize;
-    private float _kernelCircularity;
+    public KernelGenerator kernelGenerator;
     private bool[,] _kernel;
 
 
     public MapGenerator(int width, int height, Vector2Int startPos, Vector2Int[] targetPositions,
         float bestMoveProbability,
         int kernelSize, float kernelCircularity, float kernelSizeChangeProb, float kernelCircularityChangeProb,
-        int seed)
+        KernelSizeConfig[] kernelConfig, int seed)
     {
         WalkerPos = startPos;
         WalkerTargetPositions = targetPositions;
@@ -216,9 +230,9 @@ public class MapGenerator
         _width = width;
         _height = height;
         _rndGen = new RandomGenerator(seed);
-        _kernelSize = kernelSize;
-        _kernelCircularity = kernelCircularity;
-        _kernel = KernelGenerator.GetCircularKernel(_kernelSize, _kernelCircularity);
+
+        kernelGenerator = new KernelGenerator(kernelConfig, kernelSize, kernelCircularity);
+        _kernel = kernelGenerator.GetCurrentKernel();
     }
 
     public void Step()
@@ -239,8 +253,8 @@ public class MapGenerator
 
         // move walker by picked move and remove tiles using a given kernel
         WalkerPos += pickedMove;
-        UpdateKernel();
-        SetBlocks(_kernel, BlockType.Empty);
+        kernelGenerator.Mutate(_kernelSizeChangeProb, _kernelCircularityChangeProb, _rndGen); 
+        Map.SetBlocks(WalkerPos.x, WalkerPos.y, kernelGenerator.GetCurrentKernel(), BlockType.Empty);
 
         // test if current target was reached
         if (WalkerPos.Equals(GetCurrentTargetPos()) && WalkerTargetPosIndex < WalkerTargetPositions.Length - 1)
@@ -284,40 +298,6 @@ public class MapGenerator
         return probabilities;
     }
 
-    private void SetBlocks(bool[,] kernel, BlockType type)
-    {
-        var kernelOffset = (kernel.GetLength(0) - 1) / 2;
-        var kernelSize = kernel.GetLength(0);
-
-        for (var x = 0; x < kernelSize; x++)
-        {
-            for (var y = 0; y < kernelSize; y++)
-            {
-                if (kernel[x, y])
-                    Map[WalkerPos.x + (x - kernelOffset), WalkerPos.y + (y - kernelOffset)] = type;
-            }
-        }
-    }
-
-    private void UpdateKernel()
-    {
-        var updateSize = _rndGen.RandomBool(_kernelSizeChangeProb);
-        var updateCircularity = _rndGen.RandomBool(_kernelCircularityChangeProb);
-
-        if (updateSize)
-            _kernelSize = _rndGen.RandomChoice(new[] { 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 5, 9 });
-
-        if (updateCircularity)
-            _kernelCircularity = _rndGen.RandomChoice(new[] { 0.0f, 0.3f, 0.7f });
-
-        if (updateSize || updateCircularity)
-        {
-            if (_kernelSize == 3)
-                _kernelCircularity = 0.0f; // circularity doesnt really make sense for a 3x3 kernel
-
-            _kernel = KernelGenerator.GetCircularKernel(_kernelSize, _kernelCircularity);
-        }
-    }
 
     private void FillSpaceWithObstacles(DistanceTransformMethod distanceTransformMethod, int distanceThreshold)
     {

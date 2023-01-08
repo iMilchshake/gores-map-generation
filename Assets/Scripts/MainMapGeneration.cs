@@ -1,8 +1,9 @@
+using System;
 using Unity.Profiling;
 using UnityEngine;
 using Random = System.Random;
 
-public class Main : MonoBehaviour
+public class MainMapGeneration : MonoBehaviour
 {
     public GameObject squarePrefab;
     public MapGenerator MapGen;
@@ -25,35 +26,26 @@ public class Main : MonoBehaviour
     [Header("Random Walker Config")] public float bestMoveProbability;
     public float kernelSizeChangeProb;
     public float kernelCircularityChangeProb;
+    public KernelSizeConfig[] kernelConfig;
 
     [Header("Obstacle Config")] public DistanceTransformMethod distanceTransformMethod;
     public int distanceThreshold;
-
 
     private int _kernelSize = 3;
     private float _kernelCircularity = 0.0f;
     private bool _generating = false;
     private int _currentIteration = 0;
 
-
     static readonly ProfilerMarker MarkerMapGenStep = new("MapGeneration.Step");
     static readonly ProfilerMarker MarkerMapGenFinishStep = new("MapGeneration.FinishStep");
 
     void Start()
     {
-        // generate map
         GridDisplay = new GridDisplay(squarePrefab, hookableColor, unhookableColor, freezeColor, emptyColor,
             obstacleColor);
         GridDisplay.DisplayGrid(new Map(mapWidth, mapHeight)); // display empty map so tiles are initialized TODO: lol
         SeedGenerator = new Random(42);
         StartGeneration();
-
-        // var test = new int[11, 11];
-        // ArrayUtils.FillArray2D(test, int.MaxValue);
-        // test[5, 5] = 0;
-        // Debug.Log(ArrayUtils.Array2DToString(test));
-        // MathUtil.DistanceTransformCityBlock(test);
-        // Debug.Log(ArrayUtils.Array2DToString(test));
     }
 
 
@@ -109,6 +101,7 @@ public class Main : MonoBehaviour
             _kernelCircularity,
             kernelSizeChangeProb,
             kernelCircularityChangeProb,
+            kernelConfig,
             seed: forceSeed ? 0 : SeedGenerator.Next()
         );
         _generating = true;

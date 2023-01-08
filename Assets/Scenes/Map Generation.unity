@@ -266,7 +266,7 @@ MonoBehaviour:
   freezeColor: {r: 0.01, g: 0, b: 0.05, a: 0.5}
   emptyColor: {r: 1, g: 1, b: 1, a: 0.1}
   obstacleColor: {r: 0.43916875, g: 0.6698113, b: 0.43916875, a: 1}
-  iterationsPerUpdate: 1000
+  iterationsPerUpdate: 2000
   maxIterations: 9000
   mapHeight: 150
   mapWidth: 400
@@ -275,6 +275,44 @@ MonoBehaviour:
   bestMoveProbability: 0.06
   kernelSizeChangeProb: 0.05
   kernelCircularityChangeProb: 0.05
+  kernelConfig:
+  - Size: 3
+    SizeProbability: 0.1
+    CirularicyProbabilities:
+    - Circularity: 0
+      Probability: 1
+  - Size: 4
+    SizeProbability: 0.1
+    CirularicyProbabilities:
+    - Circularity: 0
+      Probability: 0.5
+    - Circularity: 0.5
+      Probability: 0.5
+  - Size: 5
+    SizeProbability: 0.5
+    CirularicyProbabilities:
+    - Circularity: 0
+      Probability: 0.25
+    - Circularity: 0.5
+      Probability: 0.75
+  - Size: 6
+    SizeProbability: 0.2
+    CirularicyProbabilities:
+    - Circularity: 0
+      Probability: 0.25
+    - Circularity: 0.35
+      Probability: 0.5
+    - Circularity: 0.8
+      Probability: 0.25
+  - Size: 7
+    SizeProbability: 0.1
+    CirularicyProbabilities:
+    - Circularity: 0
+      Probability: 0.25
+    - Circularity: 0.35
+      Probability: 0.5
+    - Circularity: 0.8
+      Probability: 0.25
   distanceTransformMethod: 1
   distanceThreshold: 22
 --- !u!4 &714146207
@@ -291,4 +329,49 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1061701086
+GameObject:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1061701088}
+  - component: {fileID: 1061701087}
+  m_Layer: 0
+  m_Name: Prefab Indexer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1061701087
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1061701086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05a7c62fccbafd342991629222351294, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _scenePrefabInstances: []
+--- !u!4 &1061701088
+Transform:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1061701086}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

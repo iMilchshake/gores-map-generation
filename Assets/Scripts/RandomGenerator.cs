@@ -18,20 +18,47 @@ public class RandomGenerator
 
     public Vector2Int PickRandomMove(MoveArray moves)
     {
-        var probabilitySum = moves.Sum(); // could be something other than 1
+        if (Math.Abs(moves.Sum() - 1.0f) > 1e-5)
+            throw new Exception("probability doesnt sum up to 1");
 
-        var pickedRandomValue = _rnd.NextDouble() * probabilitySum;
-        var currentValueSum = 0f;
-        foreach (var move in moves.GetAllValidMoves())
+        // this is a shitty way of flattening the 2D array TODO: update this when MoveArray gets reworked!
+        var probabilities = new float[9];
+        var index = 0;
+        for (var x = -1; x <= 1; x++)
         {
-            currentValueSum += moves[move]; // add current probability
-            if (currentValueSum >= pickedRandomValue)
+            for (var y = -1; y <= 1; y++)
             {
-                return move; // picked value was surpassed, return current move
+                probabilities[index] = moves[x, y];
+                index++;
             }
         }
 
-        throw new Exception("no move was picked"); // this shouldn't happen lol
+        return RandomRouletteSelect(moves.GetAllValidMoves(), probabilities);
+    }
+
+
+    public T RandomRouletteSelect<T>(T[] options, float[] probabilities)
+    {
+        // similar to https://en.wikipedia.org/wiki/Fitness_proportionate_selection
+        // expects probabilities to sum to 1
+
+        var length = options.Length;
+        if (length != probabilities.Length)
+            throw new Exception("inputs dont have the same length");
+
+        var pickedRandomValue = _rnd.NextDouble();
+        var currentValueSum = 0f;
+
+        for (int index = 0; index < length; index++)
+        {
+            currentValueSum += probabilities[index];
+            if (currentValueSum >= pickedRandomValue)
+            {
+                return options[index]; // picked value was surpassed, return current option 
+            }
+        }
+
+        throw new Exception("no option was selected"); // this cant really happen
     }
 
     public bool RandomBool(float probability)

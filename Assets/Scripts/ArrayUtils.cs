@@ -42,4 +42,20 @@
 
         return strOut;
     }
+
+    public static string Array2DToString(bool[,] array)
+    {
+        var strOut = "";
+        for (var y = 0; y < array.GetLength(1); y++)
+        {
+            for (var x = 0; x < array.GetLength(0) - 1; x++)
+            {
+                strOut += array[x, y] ? "X" : "0" + ",";
+            }
+
+            strOut += array[array.GetLength(0) - 1, y] ? "X" : "0" + "\n";
+        }
+
+        return strOut;
+    }
 }
