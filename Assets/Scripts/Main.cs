@@ -15,19 +15,26 @@ public class Main : MonoBehaviour
     public Color emptyColor;
     public Color obstacleColor;
 
-    [Header("Generation Config")] public int iterationsPerUpdate;
+    [Header("Initialization Config")] public int iterationsPerUpdate;
     public int maxIterations;
     public int mapHeight;
     public int mapWidth;
+    public int margin;
+    public bool forceSeed;
 
     [Header("Random Walker Config")] public float bestMoveProbability;
     public float kernelSizeChangeProb;
     public float kernelCircularityChangeProb;
 
+    [Header("Obstacle Config")] public DistanceTransformMethod distanceTransformMethod;
+    public int distanceThreshold;
+
+
     private int _kernelSize = 3;
     private float _kernelCircularity = 0.0f;
     private bool _generating = false;
     private int _currentIteration = 0;
+
 
     static readonly ProfilerMarker MarkerMapGenStep = new("MapGeneration.Step");
     static readonly ProfilerMarker MarkerMapGenFinishStep = new("MapGeneration.FinishStep");
@@ -74,7 +81,7 @@ public class Main : MonoBehaviour
                     Debug.Log($"finished with {_currentIteration} iterations");
                     using (MarkerMapGenFinishStep.Auto())
                     {
-                        MapGen.OnFinish();
+                        MapGen.OnFinish(distanceTransformMethod, distanceThreshold);
                     }
 
                     GridDisplay.DisplayGrid(MapGen.Map);
@@ -89,8 +96,6 @@ public class Main : MonoBehaviour
 
     private void StartGeneration()
     {
-        var margin = 50;
-
         MapGen = new MapGenerator(mapWidth, mapHeight,
             new Vector2Int(margin, margin),
             new[]
@@ -104,7 +109,7 @@ public class Main : MonoBehaviour
             _kernelCircularity,
             kernelSizeChangeProb,
             kernelCircularityChangeProb,
-            seed: SeedGenerator.Next()
+            seed: forceSeed ? 0 : SeedGenerator.Next()
         );
         _generating = true;
         _currentIteration = 0;

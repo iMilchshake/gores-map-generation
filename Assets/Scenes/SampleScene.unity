@@ -267,12 +267,16 @@ MonoBehaviour:
   emptyColor: {r: 1, g: 1, b: 1, a: 0.1}
   obstacleColor: {r: 0.43916875, g: 0.6698113, b: 0.43916875, a: 1}
   iterationsPerUpdate: 1000
-  maxIterations: 7500
+  maxIterations: 9000
   mapHeight: 150
   mapWidth: 400
+  margin: 50
+  forceSeed: 0
   bestMoveProbability: 0.06
   kernelSizeChangeProb: 0.05
   kernelCircularityChangeProb: 0.05
+  distanceTransformMethod: 1
+  distanceThreshold: 22
 --- !u!4 &714146207
 Transform:
   m_ObjectHideFlags: 0

@@ -6,3 +6,10 @@
     Empty,
     Obstacle
 }
+
+
+public enum DistanceTransformMethod
+{
+    Cityblock,
+    Chamfer
+}

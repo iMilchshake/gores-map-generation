@@ -37,7 +37,7 @@ public class Map
         return new Map((BlockType[,])grid.Clone());
     }
 
-    public int[,] GetDistanceMap()
+    public int[,] GetDistanceMap(DistanceTransformMethod distanceTransformMethod)
     {
         // setup distance array 
         int[,] distance = new int[Width, Height];
@@ -54,7 +54,7 @@ public class Map
         }
 
         // calculate distance transform
-        MathUtil.DistanceTransformCityBlock(distance);
+        MathUtil.DistanceTransform(distance, distanceTransformMethod);
         return distance;
     }
 
@@ -225,7 +225,7 @@ public class MapGenerator
     {
         // pick a random move based on the distance towards the current target position 
         var distanceProbabilities = GetDistanceProbabilities(3);
-        
+
         // hotfix: dont allow diagonal moves TODO: MoveArray requires a proper rework since diagonal moves seem to add no value
         distanceProbabilities[-1, -1] = 0.0f;
         distanceProbabilities[1, -1] = 0.0f;
@@ -233,7 +233,7 @@ public class MapGenerator
         distanceProbabilities[1, 1] = 0.0f;
         distanceProbabilities[0, 0] = 0.0f;
         distanceProbabilities.Normalize();
-       
+
         // pick a move based on the probabilities
         var pickedMove = _rndGen.PickRandomMove(distanceProbabilities);
 
@@ -250,9 +250,9 @@ public class MapGenerator
         }
     }
 
-    public void OnFinish()
+    public void OnFinish(DistanceTransformMethod distanceTransformMethod, int distanceThreshold)
     {
-        FillSpaceWithObstacles();
+        FillSpaceWithObstacles(distanceTransformMethod, distanceThreshold);
         GenerateFreeze();
     }
 
@@ -319,16 +319,16 @@ public class MapGenerator
         }
     }
 
-    private void FillSpaceWithObstacles()
+    private void FillSpaceWithObstacles(DistanceTransformMethod distanceTransformMethod, int distanceThreshold)
     {
-        var distances = Map.GetDistanceMap();
+        var distances = Map.GetDistanceMap(distanceTransformMethod);
         var width = distances.GetLength(0);
         var height = distances.GetLength(1);
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
             {
-                if (distances[x, y] >= 7)
+                if (distances[x, y] >= distanceThreshold)
                 {
                     Map[x, y] = BlockType.Hookable;
                 }
