@@ -15,6 +15,9 @@ public class MainMapGeneration : MonoBehaviour
     public Color freezeColor;
     public Color emptyColor;
     public Color obstacleColor;
+    public Color startColor;
+    public Color spawnColor;
+    public Color finishColor;
 
     [Header("Initialization Config")] public int iterationsPerUpdate;
     public int maxIterations;
@@ -42,7 +45,7 @@ public class MainMapGeneration : MonoBehaviour
     void Start()
     {
         GridDisplay = new GridDisplay(squarePrefab, hookableColor, unhookableColor, freezeColor, emptyColor,
-            obstacleColor);
+            obstacleColor, startColor, spawnColor, finishColor);
         GridDisplay.DisplayGrid(new Map(mapWidth, mapHeight)); // display empty map so tiles are initialized TODO: lol
         SeedGenerator = new Random(42);
         StartGeneration();

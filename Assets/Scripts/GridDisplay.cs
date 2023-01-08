@@ -14,9 +14,12 @@ public class GridDisplay
     private readonly Color _freezeColor;
     private readonly Color _emptyColor;
     private readonly Color _obstacleColor;
+    public readonly Color _startColor;
+    public readonly Color _spawnColor;
+    public readonly Color _finishColor;
 
     public GridDisplay(GameObject squarePrefab, Color hookableColor, Color unhookableColor, Color freezeColor,
-        Color emptyColor, Color obstacleColor)
+        Color emptyColor, Color obstacleColor, Color startColor, Color spawnColor, Color finishColor)
     {
         _squarePrefab = squarePrefab;
         _tileParentObject = new GameObject("Tiles");
@@ -26,6 +29,9 @@ public class GridDisplay
         _freezeColor = freezeColor;
         _emptyColor = emptyColor;
         _obstacleColor = obstacleColor;
+        _startColor = startColor;
+        _spawnColor = spawnColor;
+        _finishColor = finishColor;
     }
 
     public void ClearDisplay()

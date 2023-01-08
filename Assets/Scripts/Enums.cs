@@ -4,7 +4,10 @@
     Unhookable,
     Freeze,
     Empty,
-    Obstacle
+    Obstacle,
+    Start,
+    Spawn,
+    Finish
 }
 
 
