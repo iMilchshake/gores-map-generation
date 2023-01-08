@@ -225,6 +225,16 @@ public class MapGenerator
     {
         // pick a random move based on the distance towards the current target position 
         var distanceProbabilities = GetDistanceProbabilities(3);
+        
+        // hotfix: dont allow diagonal moves TODO: MoveArray requires a proper rework since diagonal moves seem to add no value
+        distanceProbabilities[-1, -1] = 0.0f;
+        distanceProbabilities[1, -1] = 0.0f;
+        distanceProbabilities[-1, 1] = 0.0f;
+        distanceProbabilities[1, 1] = 0.0f;
+        distanceProbabilities[0, 0] = 0.0f;
+        distanceProbabilities.Normalize();
+       
+        // pick a move based on the probabilities
         var pickedMove = _rndGen.PickRandomMove(distanceProbabilities);
 
         // move walker by picked move and remove tiles using a given kernel
