@@ -69,14 +69,12 @@ public class MainMapGeneration : MonoBehaviour
                 if (_currentIteration > maxIterations || MapGen.WalkerPos.Equals(MapGen.GetCurrentTargetPos()))
                 {
                     _generating = false;
-                    GridDisplay.DisplayGrid(MapGen.Map);
                     Debug.Log($"finished with {_currentIteration} iterations");
-                    using (MarkerMapGenFinishStep.Auto())
-                    {
-                        MapGen.OnFinish(distanceTransformMethod, distanceThreshold);
-                    }
-
+                    MapGen.OnFinish(distanceTransformMethod, distanceThreshold);
                     GridDisplay.DisplayGrid(MapGen.Map);
+                    Debug.Log("exporting map");
+                    MapGen.Map.ExportMap("testMap");
+                    Debug.Log("done");
                     break;
                 }
             }

@@ -58,7 +58,6 @@ public class KernelGenerator
         var updateSize = rndGen.RandomBool(sizeUpdateProbability);
         var updateCircularity = rndGen.RandomBool(circularityUpdateProbability);
 
-        // TODO: actually use probability config here
         if (updateSize)
         {
             var probabilities = config.Select(c => c.SizeProbability).ToArray();

@@ -27,6 +27,16 @@ public class Map
         set => grid[x, y] = value;
     }
 
+    public static bool CheckSameDimension(Map map1, Map map2)
+    {
+        return map1.Height == map2.Height && map1.Width == map2.Width;
+    }
+
+    public void ExportMap(string name)
+    {
+        IO.MapSerializer.ExportMap(this, name);
+    }
+
     public void SetBlocks(int xPos, int yPos, bool[,] kernel, BlockType type)
     {
         var kernelOffset = (kernel.GetLength(0) - 1) / 2;
@@ -42,10 +52,6 @@ public class Map
         }
     }
 
-    public static bool CheckSameDimension(Map map1, Map map2)
-    {
-        return map1.Height == map2.Height && map1.Width == map2.Width;
-    }
 
     public Map Clone()
     {
@@ -253,7 +259,7 @@ public class MapGenerator
 
         // move walker by picked move and remove tiles using a given kernel
         WalkerPos += pickedMove;
-        kernelGenerator.Mutate(_kernelSizeChangeProb, _kernelCircularityChangeProb, _rndGen); 
+        kernelGenerator.Mutate(_kernelSizeChangeProb, _kernelCircularityChangeProb, _rndGen);
         Map.SetBlocks(WalkerPos.x, WalkerPos.y, kernelGenerator.GetCurrentKernel(), BlockType.Empty);
 
         // test if current target was reached
