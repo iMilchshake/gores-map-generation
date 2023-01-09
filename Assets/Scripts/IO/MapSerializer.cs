@@ -68,13 +68,12 @@ namespace IO
         // This class can export a given map in the "MapDir" format
         // Requires a tool like https://gitlab.com/Patiga/twmap to convert to a playable .map
 
-        private FileStream _infoJsonStream;
-
-        public static async void ExportMap(Map map, string mapName)
+        public static void ExportMap(Map map, string mapName)
         {
             // create required dictionaries
             Directory.CreateDirectory($@"{MapDir}\{mapName}\groups\0_Game\layers\");
 
+            // create json files using above defined structs
             CreateVersionJson(mapName);
             CreateInfoJson(mapName);
             CreateGroupsJson(mapName);
@@ -121,34 +120,31 @@ namespace IO
 
         private static void CreateGameLayer(string mapName, Map map)
         {
+            // define tw-tiles for given map
             List<Tile> tiles = new List<Tile>();
             for (int x = 0; x < map.Width; x++)
             {
                 for (int y = 0; y < map.Height; y++)
                 {
                     var flippedY = map.Height - y - 1; // tw map has flipped y orientation
-                    if (map[x, y] == BlockType.Hookable)
+                    if (map[x, y] != BlockType.Empty)
                         tiles.Add(new Tile
                         {
                             x = x,
                             y = flippedY,
-                            id = 1,
-                            mirrored = false,
-                            rotation = 0
-                        });
-
-                    if (map[x, y] == BlockType.Freeze)
-                        tiles.Add(new Tile
-                        {
-                            x = x,
-                            y = flippedY,
-                            id = 9,
+                            id = map[x, y] switch
+                            {
+                                BlockType.Hookable => 1,
+                                BlockType.Freeze => 144,
+                                _ => 0 // empty?
+                            },
                             mirrored = false,
                             rotation = 0
                         });
                 }
             }
 
+            // define game layer
             Layer game = new Layer
             {
                 type = "game",
