@@ -54,6 +54,13 @@ public class MainMapGeneration : MonoBehaviour
         if (Input.GetKeyDown("r") && !_generating)
             StartGeneration();
 
+        if (Input.GetKeyDown("e") && !_generating)
+        {
+            Debug.Log($"exporting map {MapGen.Seed}");
+            MapGen.Map.ExportMap("" + MapGen.Seed);
+            Debug.Log("done");
+        }
+
         if (_generating)
         {
             // do n update steps (n = iterationsPerUpdate)
@@ -72,9 +79,7 @@ public class MainMapGeneration : MonoBehaviour
                     Debug.Log($"finished with {_currentIteration} iterations");
                     MapGen.OnFinish(distanceTransformMethod, distanceThreshold);
                     GridDisplay.DisplayGrid(MapGen.Map);
-                    Debug.Log("exporting map");
-                    MapGen.Map.ExportMap("testMap");
-                    Debug.Log("done");
+
                     break;
                 }
             }

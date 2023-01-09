@@ -207,7 +207,8 @@ public class MapGenerator
     public Map Map;
     private readonly int _width;
     private readonly int _height;
-    private RandomGenerator _rndGen = new(0);
+    private RandomGenerator _rndGen;
+    public int Seed;
 
     public Vector2Int WalkerPos;
     public Vector2Int[] WalkerTargetPositions;
@@ -236,6 +237,7 @@ public class MapGenerator
         _width = width;
         _height = height;
         _rndGen = new RandomGenerator(seed);
+        Seed = seed;
 
         kernelGenerator = new KernelGenerator(kernelConfig, kernelSize, kernelCircularity);
         _kernel = kernelGenerator.GetCurrentKernel();

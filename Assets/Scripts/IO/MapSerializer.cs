@@ -124,23 +124,24 @@ namespace IO
             List<Tile> tiles = new List<Tile>();
             for (int x = 0; x < map.Width; x++)
             {
-                for (int y = map.Height - 1; y >= 0; y--)  // tw map has flipped y orientation
+                for (int y = 0; y < map.Height; y++)
                 {
+                    var flippedY = map.Height - y - 1; // tw map has flipped y orientation
                     if (map[x, y] == BlockType.Hookable)
                         tiles.Add(new Tile
                         {
                             x = x,
-                            y = y,
+                            y = flippedY,
                             id = 1,
                             mirrored = false,
                             rotation = 0
                         });
-                    
+
                     if (map[x, y] == BlockType.Freeze)
                         tiles.Add(new Tile
                         {
                             x = x,
-                            y = y,
+                            y = flippedY,
                             id = 9,
                             mirrored = false,
                             rotation = 0
