@@ -273,46 +273,46 @@ MonoBehaviour:
   margin: 50
   forceSeed: 0
   bestMoveProbability: 0.06
-  kernelSizeChangeProb: 0.05
-  kernelCircularityChangeProb: 0.05
+  kernelSizeChangeProb: 0.2
+  kernelCircularityChangeProb: 0.5
   kernelConfig:
   - Size: 3
-    SizeProbability: 0.1
+    SizeProbability: 0.05
     CirularicyProbabilities:
     - Circularity: 0
       Probability: 1
   - Size: 4
-    SizeProbability: 0.1
-    CirularicyProbabilities:
-    - Circularity: 0
-      Probability: 0.5
-    - Circularity: 0.5
-      Probability: 0.5
-  - Size: 5
     SizeProbability: 0.5
     CirularicyProbabilities:
     - Circularity: 0
-      Probability: 0.25
+      Probability: 0.8
     - Circularity: 0.5
-      Probability: 0.75
-  - Size: 6
-    SizeProbability: 0.2
+      Probability: 0.2
+  - Size: 5
+    SizeProbability: 0.25
     CirularicyProbabilities:
     - Circularity: 0
+      Probability: 0.75
+    - Circularity: 0.5
       Probability: 0.25
+  - Size: 6
+    SizeProbability: 0.1
+    CirularicyProbabilities:
+    - Circularity: 0
+      Probability: 0.6
     - Circularity: 0.35
-      Probability: 0.5
+      Probability: 0.3
     - Circularity: 0.8
-      Probability: 0.25
+      Probability: 0.1
   - Size: 7
     SizeProbability: 0.1
     CirularicyProbabilities:
     - Circularity: 0
-      Probability: 0.25
+      Probability: 0.6
     - Circularity: 0.35
-      Probability: 0.5
+      Probability: 0.3
     - Circularity: 0.8
-      Probability: 0.25
+      Probability: 0.1
   distanceTransformMethod: 1
   distanceThreshold: 22
 --- !u!4 &714146207
