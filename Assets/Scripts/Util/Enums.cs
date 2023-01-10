@@ -15,4 +15,18 @@
         Cityblock,
         Chamfer
     }
+
+    public enum MapGeneratorMode
+    {
+        DistanceProbability,
+        Tunnel // 
+    }
+
+    public enum Direction
+    {
+        Up,
+        Right,
+        Down,
+        Left
+    }
 }

@@ -51,8 +51,10 @@ namespace Generator
             {
                 for (var yKernel = 0; yKernel < kernelSize; yKernel++)
                 {
-                    if (kernel[xKernel, yKernel])
-                        grid[xPos + (xKernel - kernelOffset), yPos + (yKernel - kernelOffset)] = type;
+                    int x = xPos + (xKernel - kernelOffset);
+                    int y = yPos + (yKernel - kernelOffset);
+                    if (kernel[xKernel, yKernel] && x > 0 && x < Width && y > 0 && y < Height)
+                        grid[x, y] = type;
                 }
             }
         }
@@ -210,76 +212,97 @@ namespace Generator
     public class MapGenerator
     {
         public Map Map { get; }
+        public int Seed { get; }
+        public Vector2Int WalkerPos;
 
         private readonly int _width;
         private readonly int _height;
         private RandomGenerator _rndGen;
-        public int Seed;
-
-        public Vector2Int WalkerPos;
-        public Vector2Int[] WalkerTargetPositions;
-        public int WalkerTargetPosIndex = 0;
-
         private float _bestMoveProbability;
         private float _kernelSizeChangeProb;
         private float _kernelCircularityChangeProb;
-
-        public KernelGenerator kernelGenerator;
-        private bool[,] _kernel;
         private List<Vector2Int> _positions;
+        private KernelGenerator _kernelGenerator;
+        private Vector2Int[] _walkerTargetPositions;
 
+        private bool[,] _kernel;
+        private int _walkerTargetPosIndex = 0;
+        private MapGeneratorMode _walkerMode;
+
+        private int _tunnelRemainingSteps = 0;
+        private Vector2Int _tunnelLastDir;
 
         public MapGenerator(int width, int height, Vector2Int startPos, Vector2Int[] targetPositions,
             float bestMoveProbability,
             int kernelSize, float kernelCircularity, float kernelSizeChangeProb, float kernelCircularityChangeProb,
             KernelSizeConfig[] kernelConfig, int seed)
         {
-            WalkerPos = startPos;
-            WalkerTargetPositions = targetPositions;
             Map = new Map(width, height);
+            Seed = seed;
+            WalkerPos = startPos;
 
-            _bestMoveProbability = bestMoveProbability;
-            _kernelSizeChangeProb = kernelSizeChangeProb;
-            _kernelCircularityChangeProb = kernelCircularityChangeProb;
             _width = width;
             _height = height;
             _rndGen = new RandomGenerator(seed);
-            Seed = seed;
-
+            _bestMoveProbability = bestMoveProbability;
+            _kernelSizeChangeProb = kernelSizeChangeProb;
+            _kernelCircularityChangeProb = kernelCircularityChangeProb;
             _positions = new List<Vector2Int>();
-            _positions.Add(new Vector2Int(WalkerPos.x, WalkerPos.y));
+            _kernelGenerator = new KernelGenerator(kernelConfig, kernelSize, kernelCircularity);
+            _walkerTargetPositions = targetPositions;
 
-            kernelGenerator = new KernelGenerator(kernelConfig, kernelSize, kernelCircularity);
-            _kernel = kernelGenerator.GetCurrentKernel();
+            _walkerMode = MapGeneratorMode.DistanceProbability; // default mode 
+            _kernel = _kernelGenerator.GetCurrentKernel();
+            _positions.Add(new Vector2Int(WalkerPos.x, WalkerPos.y));
         }
 
         public void Step()
         {
-            // pick a random move based on the distance towards the current target position 
-            var distanceProbabilities = GetDistanceProbabilities(3);
+            Vector2Int pickedMove;
+            switch (_walkerMode)
+            {
+                case MapGeneratorMode.DistanceProbability:
+                    var distanceProbabilities = GetDistanceProbabilities(3);
+                    pickedMove = _rndGen.PickRandomMove(distanceProbabilities);
+                    _kernelGenerator.Mutate(_kernelSizeChangeProb, _kernelCircularityChangeProb, _rndGen);
+                    if (_rndGen.RandomBool(0.005f))
+                    {
+                        _walkerMode = MapGeneratorMode.Tunnel;
+                        _tunnelRemainingSteps = 15;
+                        _tunnelLastDir = pickedMove;
+                    }
 
-            // hotfix: dont allow diagonal moves TODO: MoveArray requires a proper rework since diagonal moves seem to add no value
-            distanceProbabilities[-1, -1] = 0.0f;
-            distanceProbabilities[1, -1] = 0.0f;
-            distanceProbabilities[-1, 1] = 0.0f;
-            distanceProbabilities[1, 1] = 0.0f;
-            distanceProbabilities[0, 0] = 0.0f;
-            distanceProbabilities.Normalize();
+                    break;
+                case MapGeneratorMode.Tunnel:
+                    if (_tunnelRemainingSteps <= 0)
+                        _walkerMode = MapGeneratorMode.DistanceProbability;
+                    _tunnelRemainingSteps--;
 
-            // pick a move based on the probabilities
-            var pickedMove = _rndGen.PickRandomMove(distanceProbabilities);
+
+                    // update direction
+                    if (_rndGen.RandomBool(0.00f))
+                    {
+                        _tunnelLastDir = _rndGen.PickRandomMove(GetDistanceProbabilities(3));
+                    }
+
+                    _kernel = KernelGenerator.GetKernel(4, 0.0f);
+                    pickedMove = _tunnelLastDir;
+                    break;
+                default:
+                    throw new Exception("invalid mode");
+            }
+
 
             // move walker by picked move and remove tiles using a given kernel
             WalkerPos += pickedMove;
             _positions.Add(new Vector2Int(WalkerPos.x, WalkerPos.y));
-            kernelGenerator.Mutate(_kernelSizeChangeProb, _kernelCircularityChangeProb, _rndGen);
-            Map.SetBlocks(WalkerPos.x, WalkerPos.y, kernelGenerator.GetCurrentKernel(), BlockType.Empty);
+            Map.SetBlocks(WalkerPos.x, WalkerPos.y, _kernelGenerator.GetCurrentKernel(), BlockType.Empty);
 
             // test if current target was reached
-            if (WalkerPos.Equals(GetCurrentTargetPos()) && WalkerTargetPosIndex < WalkerTargetPositions.Length - 1)
+            if (WalkerPos.Equals(GetCurrentTargetPos()) && _walkerTargetPosIndex < _walkerTargetPositions.Length - 1)
             {
-                Debug.Log($"reached targetPos index={WalkerTargetPosIndex}");
-                WalkerTargetPosIndex++;
+                Debug.Log($"reached targetPos index={_walkerTargetPosIndex}");
+                _walkerTargetPosIndex++;
             }
         }
 
@@ -292,7 +315,7 @@ namespace Generator
 
         public Vector2Int GetCurrentTargetPos()
         {
-            return WalkerTargetPositions[WalkerTargetPosIndex];
+            return _walkerTargetPositions[_walkerTargetPosIndex];
         }
 
         private MoveArray GetDistanceProbabilities(int moveSize)
@@ -304,7 +327,7 @@ namespace Generator
             // calculate distances for each possible move
             var moveDistances = new float[moveCount];
             for (var moveIndex = 0; moveIndex < moveCount; moveIndex++)
-                moveDistances[moveIndex] = Vector2Int.Distance(WalkerTargetPositions[WalkerTargetPosIndex],
+                moveDistances[moveIndex] = Vector2Int.Distance(_walkerTargetPositions[_walkerTargetPosIndex],
                     WalkerPos + validMoves[moveIndex]);
 
             // sort moves by their respective distance to the goal
@@ -314,6 +337,13 @@ namespace Generator
             for (var moveIndex = 0; moveIndex < moveCount; moveIndex++)
                 probabilities[validMoves[moveIndex]] =
                     MathUtil.GeometricDistribution(moveIndex + 1, _bestMoveProbability);
+
+            // hotfix: dont allow diagonal moves TODO: MoveArray requires a proper rework since diagonal moves seem to add no value
+            probabilities[-1, -1] = 0.0f;
+            probabilities[1, -1] = 0.0f;
+            probabilities[-1, 1] = 0.0f;
+            probabilities[1, 1] = 0.0f;
+            probabilities[0, 0] = 0.0f;
             probabilities.Normalize(); // normalize the probabilities so that they sum up to 1
 
             return probabilities;

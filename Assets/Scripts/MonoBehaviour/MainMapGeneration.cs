@@ -40,9 +40,6 @@ namespace MonoBehaviour
         private bool _generating = false;
         private int _currentIteration = 0;
 
-        static readonly ProfilerMarker MarkerMapGenStep = new("MapGeneration.Step");
-        static readonly ProfilerMarker MarkerMapGenFinishStep = new("MapGeneration.FinishStep");
-
         void Start()
         {
             GridDisplay = new GridDisplay(squarePrefab, hookableColor, unhookableColor, freezeColor, emptyColor,
@@ -71,11 +68,7 @@ namespace MonoBehaviour
                 // do n update steps (n = iterationsPerUpdate)
                 for (int i = 0; i < iterationsPerUpdate; i++)
                 {
-                    using (MarkerMapGenStep.Auto())
-                    {
-                        MapGen.Step();
-                    }
-
+                    MapGen.Step();
                     _currentIteration++;
 
                     if (_currentIteration > maxIterations || MapGen.WalkerPos.Equals(MapGen.GetCurrentTargetPos()))
@@ -84,7 +77,6 @@ namespace MonoBehaviour
                         Debug.Log($"finished with {_currentIteration} iterations");
                         MapGen.OnFinish(distanceTransformMethod, distanceThreshold);
                         GridDisplay.DisplayGrid(MapGen.Map);
-
                         break;
                     }
                 }
