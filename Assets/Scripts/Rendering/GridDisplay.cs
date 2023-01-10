@@ -99,7 +99,8 @@ namespace Rendering
         private GridTile InitializeSquare(Vector2 position, BlockType type)
         {
             // initialize Unity components
-            var square = Object.Instantiate(_squarePrefab, new Vector3(position.x, position.y, 1.0f), Quaternion.identity);
+            var square = Object.Instantiate(_squarePrefab, new Vector3(position.x, position.y, 1.0f),
+                Quaternion.identity);
             square.transform.SetParent(_tileParentObject.transform);
             var render = square.GetComponent<SpriteRenderer>();
 

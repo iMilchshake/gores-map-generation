@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using UnityEngine;
 using Util;
 
 namespace Generator
@@ -48,7 +47,8 @@ namespace Generator
             {
                 var circularityProbabilitySum = sizeConfig.CirularicyProbabilities.Sum(c => c.Probability);
                 if (!MathUtil.CheckFloat(circularityProbabilitySum, 1.0f))
-                    throw new ArithmeticException($"circularity probabilities dont sum up to 1 for size={sizeConfig.Size}");
+                    throw new ArithmeticException(
+                        $"circularity probabilities dont sum up to 1 for size={sizeConfig.Size}");
             }
         }
 
@@ -63,7 +63,6 @@ namespace Generator
                 var sizes = config.Select(c => c.Size).ToArray();
                 var selectedSize = rndGen.RandomRouletteSelect(sizes, probabilities);
                 size = selectedSize;
-                Debug.Log(Time.time + " " + size);
             }
 
             if (updateCircularity)
@@ -75,14 +74,12 @@ namespace Generator
                 var probabilities = config[index].CirularicyProbabilities.Select(c => c.Probability).ToArray();
                 var selectedCircularity = rndGen.RandomRouletteSelect(circularities, probabilities);
                 circularity = selectedCircularity;
-                Debug.Log($"{Time.time}: size={config[index].Size}, new circularity={selectedCircularity}");
             }
 
             // if a change occured -> update current kernel
             if (updateSize || updateCircularity)
             {
                 currentKernel = GetKernel(size, circularity);
-                Debug.Log($"{Time.time}: kernel: {currentKernel.GetLength(0)},{currentKernel.GetLength(1)}");
             }
         }
 

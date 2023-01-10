@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using IO;
 using UnityEngine;
 using Util;
@@ -225,6 +226,7 @@ namespace Generator
 
         public KernelGenerator kernelGenerator;
         private bool[,] _kernel;
+        private List<Vector2Int> _positions;
 
 
         public MapGenerator(int width, int height, Vector2Int startPos, Vector2Int[] targetPositions,
@@ -243,6 +245,9 @@ namespace Generator
             _height = height;
             _rndGen = new RandomGenerator(seed);
             Seed = seed;
+
+            _positions = new List<Vector2Int>();
+            _positions.Add(new Vector2Int(WalkerPos.x, WalkerPos.y));
 
             kernelGenerator = new KernelGenerator(kernelConfig, kernelSize, kernelCircularity);
             _kernel = kernelGenerator.GetCurrentKernel();
@@ -266,6 +271,7 @@ namespace Generator
 
             // move walker by picked move and remove tiles using a given kernel
             WalkerPos += pickedMove;
+            _positions.Add(new Vector2Int(WalkerPos.x, WalkerPos.y));
             kernelGenerator.Mutate(_kernelSizeChangeProb, _kernelCircularityChangeProb, _rndGen);
             Map.SetBlocks(WalkerPos.x, WalkerPos.y, kernelGenerator.GetCurrentKernel(), BlockType.Empty);
 
@@ -281,6 +287,7 @@ namespace Generator
         {
             FillSpaceWithObstacles(distanceTransformMethod, distanceThreshold);
             GenerateFreeze();
+            SetPlatforms();
         }
 
         public Vector2Int GetCurrentTargetPos()
@@ -305,7 +312,8 @@ namespace Generator
 
             // assign each move a probability based on their index in the sorted order
             for (var moveIndex = 0; moveIndex < moveCount; moveIndex++)
-                probabilities[validMoves[moveIndex]] = MathUtil.GeometricDistribution(moveIndex + 1, _bestMoveProbability);
+                probabilities[validMoves[moveIndex]] =
+                    MathUtil.GeometricDistribution(moveIndex + 1, _bestMoveProbability);
             probabilities.Normalize(); // normalize the probabilities so that they sum up to 1
 
             return probabilities;
@@ -341,6 +349,45 @@ namespace Generator
                         Map.CheckTypeInArea(x - 1, y - 1, x + 1, y + 1, BlockType.Hookable))
                         Map[x, y] = BlockType.Freeze;
                 }
+            }
+        }
+
+        private void SetPlatforms()
+        {
+            // very WIP, but kinda works?
+            int minPlatformDistance = 200; // an average distance might allow for better platform placement
+            int safeDistanceX = 3;
+            int safeDistanceY = 4;
+
+            int lastPlatformIndex = 0;
+            int currentPositionIndex = 0;
+            int positionsCount = _positions.Count;
+
+            while (currentPositionIndex < positionsCount)
+            {
+                if (currentPositionIndex > lastPlatformIndex + minPlatformDistance)
+                {
+                    int x = _positions[currentPositionIndex].x;
+                    int y = _positions[currentPositionIndex].y;
+                    if (!Map.CheckTypeInArea(x - safeDistanceX, y - safeDistanceY, x + safeDistanceX, y + safeDistanceY,
+                            BlockType.Hookable) && !Map.CheckTypeInArea(x - safeDistanceX, y - safeDistanceY,
+                            x + safeDistanceX, y + safeDistanceY,
+                            BlockType.Freeze))
+                    {
+                        // safe area, place platform
+                        Map[x, y - 3] = BlockType.Hookable;
+                        Map[x - 1, y - 3] = BlockType.Hookable;
+                        Map[x - 2, y - 3] = BlockType.Hookable;
+                        Map[x + 1, y - 3] = BlockType.Hookable;
+                        Map[x + 2, y - 3] = BlockType.Hookable;
+                        // Map[x - safeDistanceX, y - safeDistanceY] = BlockType.Unhookable;
+                        // Map[x + safeDistanceX, y + safeDistanceY] = BlockType.Unhookable;
+
+                        lastPlatformIndex = currentPositionIndex;
+                    }
+                }
+
+                currentPositionIndex++;
             }
         }
     }
