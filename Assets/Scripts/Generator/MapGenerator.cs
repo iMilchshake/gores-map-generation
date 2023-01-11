@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using IO;
+using MonoBehaviour;
+using Unity.VisualScripting;
 using UnityEngine;
 using Util;
 
@@ -211,54 +213,48 @@ namespace Generator
 
     public class MapGenerator
     {
-        public Map Map { get; }
-        public int Seed { get; }
-        public Vector2Int WalkerPos;
+        // config
+        public MapGenerationConfig config;
 
-        private readonly int _width;
-        private readonly int _height;
+        // data structures
+        public Map Map { get; }
         private RandomGenerator _rndGen;
-        private float _bestMoveProbability;
-        private float _kernelSizeChangeProb;
-        private float _kernelCircularityChangeProb;
         private List<Vector2Int> _positions;
         private KernelGenerator _kernelGenerator;
-        private Vector2Int[] _walkerTargetPositions;
 
+        // walker state
+        public Vector2Int WalkerPos;
         private bool[,] _kernel;
         private int _walkerTargetPosIndex = 0;
         private MapGeneratorMode _walkerMode;
 
+        // tunnel mode state
         private int _tunnelRemainingSteps = 0;
         private Vector2Int _tunnelLastDir;
 
-        public MapGenerator(int width, int height, Vector2Int startPos, Vector2Int[] targetPositions,
-            float bestMoveProbability,
-            int kernelSize, float kernelCircularity, float kernelSizeChangeProb, float kernelCircularityChangeProb,
-            KernelSizeConfig[] kernelConfig, int seed)
+        public MapGenerator(MapGenerationConfig config)
         {
-            Map = new Map(width, height);
-            Seed = seed;
-            WalkerPos = startPos;
+            this.config = config;
 
-            _width = width;
-            _height = height;
-            _rndGen = new RandomGenerator(seed);
-            _bestMoveProbability = bestMoveProbability;
-            _kernelSizeChangeProb = kernelSizeChangeProb;
-            _kernelCircularityChangeProb = kernelCircularityChangeProb;
+            Map = new Map(config.mapWidth, config.mapHeight);
+            _rndGen = new RandomGenerator(config.seed);
             _positions = new List<Vector2Int>();
-            _kernelGenerator = new KernelGenerator(kernelConfig, kernelSize, kernelCircularity);
-            _walkerTargetPositions = targetPositions;
-
-            _walkerMode = MapGeneratorMode.DistanceProbability; // default mode 
-            _kernel = _kernelGenerator.GetCurrentKernel();
             _positions.Add(new Vector2Int(WalkerPos.x, WalkerPos.y));
+            _kernelGenerator =
+                new KernelGenerator(config.kernelConfig, config.initKernelSize, config.initKernelCircularity);
+
+            WalkerPos = config.initPosition;
+            _kernel = _kernelGenerator.GetCurrentKernel();
+            _walkerMode = MapGeneratorMode.DistanceProbability; // start default mode 
+        }
+
+        public int GetSeed()
+        {
+            return config.seed;
         }
 
         private Vector2Int StepTunnel()
         {
-            Vector2Int pickedMove;
             if (_tunnelRemainingSteps <= 0)
                 _walkerMode = MapGeneratorMode.DistanceProbability;
             _tunnelRemainingSteps--;
@@ -270,15 +266,14 @@ namespace Generator
             }
 
             _kernel = KernelGenerator.GetKernel(4, 0.0f);
-            pickedMove = _tunnelLastDir;
-            return pickedMove;
+            return _tunnelLastDir;
         }
 
         private Vector2Int StepDistanceProbabilities()
         {
             var distanceProbabilities = GetDistanceProbabilities(3);
             var pickedMove = _rndGen.PickRandomMove(distanceProbabilities);
-            _kernelGenerator.Mutate(_kernelSizeChangeProb, _kernelCircularityChangeProb, _rndGen);
+            _kernelGenerator.Mutate(config.kernelSizeChangeProb, config.kernelCircularityChangeProb, _rndGen);
             if (_rndGen.RandomBool(0.005f))
             {
                 _walkerMode = MapGeneratorMode.Tunnel;
@@ -305,7 +300,7 @@ namespace Generator
             Map.SetBlocks(WalkerPos.x, WalkerPos.y, _kernelGenerator.GetCurrentKernel(), BlockType.Empty);
 
             // update targetPosition if current one was reached
-            if (WalkerPos.Equals(GetCurrentTargetPos()) && _walkerTargetPosIndex < _walkerTargetPositions.Length - 1)
+            if (WalkerPos.Equals(GetCurrentTargetPos()) && _walkerTargetPosIndex < config.targetPositions.Length - 1)
                 _walkerTargetPosIndex++;
         }
 
@@ -318,7 +313,7 @@ namespace Generator
 
         public Vector2Int GetCurrentTargetPos()
         {
-            return _walkerTargetPositions[_walkerTargetPosIndex];
+            return config.targetPositions[_walkerTargetPosIndex];
         }
 
         private MoveArray GetDistanceProbabilities(int moveSize)
@@ -330,8 +325,8 @@ namespace Generator
             // calculate distances for each possible move
             var moveDistances = new float[moveCount];
             for (var moveIndex = 0; moveIndex < moveCount; moveIndex++)
-                moveDistances[moveIndex] = Vector2Int.Distance(_walkerTargetPositions[_walkerTargetPosIndex],
-                    WalkerPos + validMoves[moveIndex]);
+                moveDistances[moveIndex] =
+                    Vector2Int.Distance(GetCurrentTargetPos(), WalkerPos + validMoves[moveIndex]);
 
             // sort moves by their respective distance to the goal
             Array.Sort(moveDistances, validMoves);
@@ -339,7 +334,7 @@ namespace Generator
             // assign each move a probability based on their index in the sorted order
             for (var moveIndex = 0; moveIndex < moveCount; moveIndex++)
                 probabilities[validMoves[moveIndex]] =
-                    MathUtil.GeometricDistribution(moveIndex + 1, _bestMoveProbability);
+                    MathUtil.GeometricDistribution(moveIndex + 1, config.bestMoveProbability);
 
             // hotfix: dont allow diagonal moves TODO: MoveArray requires a proper rework since diagonal moves seem to add no value
             probabilities[-1, -1] = 0.0f;
@@ -373,9 +368,9 @@ namespace Generator
         private void GenerateFreeze()
         {
             // iterate over every cell of the map
-            for (var x = 0; x < _width; x++)
+            for (var x = 0; x < config.mapWidth; x++)
             {
-                for (var y = 0; y < _height; y++)
+                for (var y = 0; y < config.mapHeight; y++)
                 {
                     // if a hookable tile is nearby -> set freeze
                     if (Map[x, y] == BlockType.Empty &&

@@ -1,3 +1,4 @@
+using System;
 using Generator;
 using Rendering;
 using UnityEngine;
@@ -6,47 +7,60 @@ using Random = System.Random;
 
 namespace MonoBehaviour
 {
+    [Serializable]
+    public struct MapGenerationConfig
+    {
+        // general map config 
+        public int maxIterations;
+        public int mapHeight;
+        public int mapWidth;
+        public int seed;
+        public Vector2Int[] targetPositions;
+
+        // initial state
+        public Vector2Int initPosition;
+        public int initKernelSize;
+        public float initKernelCircularity;
+
+        // walker config
+        public float bestMoveProbability;
+        public float kernelSizeChangeProb;
+        public float kernelCircularityChangeProb;
+        public KernelSizeConfig[] kernelConfig;
+
+        // obstacle config
+        public DistanceTransformMethod distanceTransformMethod;
+        public int distanceThreshold;
+    }
+
     public class MainMapGeneration : UnityEngine.MonoBehaviour
     {
         public GameObject squarePrefab;
-        public MapGenerator MapGen;
-        public GridDisplay GridDisplay;
-        public Random SeedGenerator;
+        private MapGenerator _mapGen;
+        private GridDisplay _gridDisplay;
+        private Random _seedGenerator;
 
         [Header("Rendering Config")] public Color hookableColor;
         public Color unhookableColor;
         public Color freezeColor;
         public Color emptyColor;
         public Color obstacleColor;
+        public int iterationsPerUpdate;
 
-        [Header("Initialization Config")] public int iterationsPerUpdate;
-        public int maxIterations;
-        public int mapHeight;
-        public int mapWidth;
-        public int margin;
-        public bool lockSeed;
+        [Header("Generation Config")] public bool lockSeed;
+        public MapGenerationConfig configuration;
 
-        [Header("Random Walker Config")] public float bestMoveProbability;
-        public float kernelSizeChangeProb;
-        public float kernelCircularityChangeProb;
-        public KernelSizeConfig[] kernelConfig;
-
-        [Header("Obstacle Config")] public DistanceTransformMethod distanceTransformMethod;
-        public int distanceThreshold;
-
-        private int _kernelSize = 3;
-        private float _kernelCircularity = 0.0f;
+        // generation state
         private bool _generating = false;
         private int _currentIteration = 0;
-        private int _currentSeed;
 
         void Start()
         {
-            GridDisplay = new GridDisplay(squarePrefab, hookableColor, unhookableColor, freezeColor, emptyColor,
+            _gridDisplay = new GridDisplay(squarePrefab, hookableColor, unhookableColor, freezeColor, emptyColor,
                 obstacleColor);
-            GridDisplay.DisplayGrid(new Map(mapWidth,
-                mapHeight)); // display empty map so tiles are initialized TODO: lol
-            SeedGenerator = new Random(42);
+            _gridDisplay.DisplayGrid(new Map(configuration.mapWidth,
+                configuration.mapHeight)); // display empty map so tiles are initialized TODO: lol
+            _seedGenerator = new Random(42);
             StartGeneration();
         }
 
@@ -58,8 +72,8 @@ namespace MonoBehaviour
 
             if (Input.GetKeyDown("e") && !_generating)
             {
-                Debug.Log($"exporting map {MapGen.Seed}");
-                MapGen.Map.ExportMap("" + MapGen.Seed);
+                Debug.Log($"exporting map {_mapGen.GetSeed()}");
+                _mapGen.Map.ExportMap("" + _mapGen.GetSeed());
                 Debug.Log("done");
             }
 
@@ -68,45 +82,31 @@ namespace MonoBehaviour
                 // do n update steps (n = iterationsPerUpdate)
                 for (int i = 0; i < iterationsPerUpdate; i++)
                 {
-                    MapGen.Step();
+                    _mapGen.Step();
                     _currentIteration++;
 
-                    if (_currentIteration > maxIterations || MapGen.WalkerPos.Equals(MapGen.GetCurrentTargetPos()))
+                    if (_currentIteration > configuration.maxIterations ||
+                        _mapGen.WalkerPos.Equals(_mapGen.GetCurrentTargetPos()))
                     {
                         _generating = false;
                         Debug.Log($"finished with {_currentIteration} iterations");
-                        MapGen.OnFinish(distanceTransformMethod, distanceThreshold);
-                        GridDisplay.DisplayGrid(MapGen.Map);
+                        _mapGen.OnFinish(configuration.distanceTransformMethod, configuration.distanceThreshold);
+                        _gridDisplay.DisplayGrid(_mapGen.Map);
                         break;
                     }
                 }
 
                 // update display
-                GridDisplay.DisplayGrid(MapGen.Map);
+                _gridDisplay.DisplayGrid(_mapGen.Map);
             }
         }
 
         private void StartGeneration()
         {
             if (!lockSeed)
-                _currentSeed = SeedGenerator.Next();
+                configuration.seed = _seedGenerator.Next();
 
-            MapGen = new MapGenerator(mapWidth, mapHeight,
-                new Vector2Int(margin, margin),
-                new[]
-                {
-                    new Vector2Int(mapWidth - margin, margin),
-                    new Vector2Int(mapWidth - margin, mapHeight - margin),
-                    new Vector2Int(margin, mapHeight - margin)
-                },
-                bestMoveProbability,
-                _kernelSize,
-                _kernelCircularity,
-                kernelSizeChangeProb,
-                kernelCircularityChangeProb,
-                kernelConfig,
-                seed: _currentSeed
-            );
+            _mapGen = new MapGenerator(configuration);
             _generating = true;
             _currentIteration = 0;
         }

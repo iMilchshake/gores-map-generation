@@ -267,54 +267,62 @@ MonoBehaviour:
   emptyColor: {r: 1, g: 1, b: 1, a: 0.1}
   obstacleColor: {r: 0.43916875, g: 0.6698113, b: 0.43916875, a: 1}
   iterationsPerUpdate: 1000
-  maxIterations: 9000
-  mapHeight: 300
-  mapWidth: 400
-  margin: 100
   lockSeed: 0
-  bestMoveProbability: 0.06
-  kernelSizeChangeProb: 0.2
-  kernelCircularityChangeProb: 0.5
-  kernelConfig:
-  - Size: 3
-    SizeProbability: 0.05
-    CirularicyProbabilities:
-    - Circularity: 0
-      Probability: 1
-  - Size: 4
-    SizeProbability: 0.5
-    CirularicyProbabilities:
-    - Circularity: 0
-      Probability: 0.8
-    - Circularity: 0.5
-      Probability: 0.2
-  - Size: 5
-    SizeProbability: 0.25
-    CirularicyProbabilities:
-    - Circularity: 0
-      Probability: 0.75
-    - Circularity: 0.5
-      Probability: 0.25
-  - Size: 6
-    SizeProbability: 0.1
-    CirularicyProbabilities:
-    - Circularity: 0
-      Probability: 0.6
-    - Circularity: 0.35
-      Probability: 0.3
-    - Circularity: 0.8
-      Probability: 0.1
-  - Size: 7
-    SizeProbability: 0.1
-    CirularicyProbabilities:
-    - Circularity: 0
-      Probability: 0.6
-    - Circularity: 0.35
-      Probability: 0.3
-    - Circularity: 0.8
-      Probability: 0.1
-  distanceTransformMethod: 1
-  distanceThreshold: 22
+  configuration:
+    maxIterations: 9000
+    mapHeight: 300
+    mapWidth: 400
+    seed: 42
+    targetPositions:
+    - {x: 300, y: 100}
+    - {x: 300, y: 200}
+    - {x: 100, y: 200}
+    initPosition: {x: 100, y: 100}
+    initKernelSize: 6
+    initKernelCircularity: 0.5
+    bestMoveProbability: 0.06
+    kernelSizeChangeProb: 0.2
+    kernelCircularityChangeProb: 0.5
+    kernelConfig:
+    - Size: 3
+      SizeProbability: 0.05
+      CirularicyProbabilities:
+      - Circularity: 0
+        Probability: 1
+    - Size: 4
+      SizeProbability: 0.5
+      CirularicyProbabilities:
+      - Circularity: 0
+        Probability: 0.8
+      - Circularity: 0.5
+        Probability: 0.2
+    - Size: 5
+      SizeProbability: 0.25
+      CirularicyProbabilities:
+      - Circularity: 0
+        Probability: 0.75
+      - Circularity: 0.5
+        Probability: 0.25
+    - Size: 6
+      SizeProbability: 0.1
+      CirularicyProbabilities:
+      - Circularity: 0
+        Probability: 0.6
+      - Circularity: 0.35
+        Probability: 0.3
+      - Circularity: 0.8
+        Probability: 0.1
+    - Size: 7
+      SizeProbability: 0.1
+      CirularicyProbabilities:
+      - Circularity: 0
+        Probability: 0.6
+      - Circularity: 0.35
+        Probability: 0.3
+      - Circularity: 0.8
+        Probability: 0.1
+    distanceTransformMethod: 1
+    distanceThreshold: 22
 --- !u!4 &714146207
 Transform:
   m_ObjectHideFlags: 0
