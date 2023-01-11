@@ -266,12 +266,12 @@ MonoBehaviour:
   freezeColor: {r: 0.01, g: 0, b: 0.05, a: 0.5}
   emptyColor: {r: 1, g: 1, b: 1, a: 0.1}
   obstacleColor: {r: 0.43916875, g: 0.6698113, b: 0.43916875, a: 1}
-  iterationsPerUpdate: 50
+  iterationsPerUpdate: 1000
   maxIterations: 9000
   mapHeight: 300
   mapWidth: 400
   margin: 100
-  forceSeed: 0
+  lockSeed: 0
   bestMoveProbability: 0.06
   kernelSizeChangeProb: 0.2
   kernelCircularityChangeProb: 0.5

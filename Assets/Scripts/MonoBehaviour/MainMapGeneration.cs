@@ -1,6 +1,5 @@
 using Generator;
 using Rendering;
-using Unity.Profiling;
 using UnityEngine;
 using Util;
 using Random = System.Random;
@@ -25,7 +24,7 @@ namespace MonoBehaviour
         public int mapHeight;
         public int mapWidth;
         public int margin;
-        public bool forceSeed;
+        public bool lockSeed;
 
         [Header("Random Walker Config")] public float bestMoveProbability;
         public float kernelSizeChangeProb;
@@ -39,6 +38,7 @@ namespace MonoBehaviour
         private float _kernelCircularity = 0.0f;
         private bool _generating = false;
         private int _currentIteration = 0;
+        private int _currentSeed;
 
         void Start()
         {
@@ -88,6 +88,9 @@ namespace MonoBehaviour
 
         private void StartGeneration()
         {
+            if (!lockSeed)
+                _currentSeed = SeedGenerator.Next();
+
             MapGen = new MapGenerator(mapWidth, mapHeight,
                 new Vector2Int(margin, margin),
                 new[]
@@ -102,7 +105,7 @@ namespace MonoBehaviour
                 kernelSizeChangeProb,
                 kernelCircularityChangeProb,
                 kernelConfig,
-                seed: forceSeed ? 0 : SeedGenerator.Next()
+                seed: _currentSeed
             );
             _generating = true;
             _currentIteration = 0;

@@ -256,54 +256,57 @@ namespace Generator
             _positions.Add(new Vector2Int(WalkerPos.x, WalkerPos.y));
         }
 
-        public void Step()
+        private Vector2Int StepTunnel()
         {
             Vector2Int pickedMove;
-            switch (_walkerMode)
+            if (_tunnelRemainingSteps <= 0)
+                _walkerMode = MapGeneratorMode.DistanceProbability;
+            _tunnelRemainingSteps--;
+
+            // update direction
+            if (_rndGen.RandomBool(0.00f))
             {
-                case MapGeneratorMode.DistanceProbability:
-                    var distanceProbabilities = GetDistanceProbabilities(3);
-                    pickedMove = _rndGen.PickRandomMove(distanceProbabilities);
-                    _kernelGenerator.Mutate(_kernelSizeChangeProb, _kernelCircularityChangeProb, _rndGen);
-                    if (_rndGen.RandomBool(0.005f))
-                    {
-                        _walkerMode = MapGeneratorMode.Tunnel;
-                        _tunnelRemainingSteps = 15;
-                        _tunnelLastDir = pickedMove;
-                    }
-
-                    break;
-                case MapGeneratorMode.Tunnel:
-                    if (_tunnelRemainingSteps <= 0)
-                        _walkerMode = MapGeneratorMode.DistanceProbability;
-                    _tunnelRemainingSteps--;
-
-
-                    // update direction
-                    if (_rndGen.RandomBool(0.00f))
-                    {
-                        _tunnelLastDir = _rndGen.PickRandomMove(GetDistanceProbabilities(3));
-                    }
-
-                    _kernel = KernelGenerator.GetKernel(4, 0.0f);
-                    pickedMove = _tunnelLastDir;
-                    break;
-                default:
-                    throw new Exception("invalid mode");
+                _tunnelLastDir = _rndGen.PickRandomMove(GetDistanceProbabilities(3));
             }
 
+            _kernel = KernelGenerator.GetKernel(4, 0.0f);
+            pickedMove = _tunnelLastDir;
+            return pickedMove;
+        }
+
+        private Vector2Int StepDistanceProbabilities()
+        {
+            var distanceProbabilities = GetDistanceProbabilities(3);
+            var pickedMove = _rndGen.PickRandomMove(distanceProbabilities);
+            _kernelGenerator.Mutate(_kernelSizeChangeProb, _kernelCircularityChangeProb, _rndGen);
+            if (_rndGen.RandomBool(0.005f))
+            {
+                _walkerMode = MapGeneratorMode.Tunnel;
+                _tunnelRemainingSteps = 15;
+                _tunnelLastDir = pickedMove;
+            }
+
+            return pickedMove;
+        }
+
+        public void Step()
+        {
+            // calculate next move depending on current _walkerMode
+            Vector2Int pickedMove = _walkerMode switch
+            {
+                MapGeneratorMode.DistanceProbability => StepDistanceProbabilities(),
+                MapGeneratorMode.Tunnel => StepTunnel(),
+                _ => Vector2Int.zero
+            };
 
             // move walker by picked move and remove tiles using a given kernel
             WalkerPos += pickedMove;
             _positions.Add(new Vector2Int(WalkerPos.x, WalkerPos.y));
             Map.SetBlocks(WalkerPos.x, WalkerPos.y, _kernelGenerator.GetCurrentKernel(), BlockType.Empty);
 
-            // test if current target was reached
+            // update targetPosition if current one was reached
             if (WalkerPos.Equals(GetCurrentTargetPos()) && _walkerTargetPosIndex < _walkerTargetPositions.Length - 1)
-            {
-                Debug.Log($"reached targetPos index={_walkerTargetPosIndex}");
                 _walkerTargetPosIndex++;
-            }
         }
 
         public void OnFinish(DistanceTransformMethod distanceTransformMethod, int distanceThreshold)
