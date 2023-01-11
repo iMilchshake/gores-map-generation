@@ -16,6 +16,8 @@ namespace MonoBehaviour
         public int mapWidth;
         public int seed;
         public Vector2Int[] targetPositions;
+        public bool generatePlatforms;
+        public bool enableTunnelMode;
 
         // initial state
         public Vector2Int initPosition;

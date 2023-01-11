@@ -274,7 +274,7 @@ namespace Generator
             var distanceProbabilities = GetDistanceProbabilities(3);
             var pickedMove = _rndGen.PickRandomMove(distanceProbabilities);
             _kernelGenerator.Mutate(config.kernelSizeChangeProb, config.kernelCircularityChangeProb, _rndGen);
-            if (_rndGen.RandomBool(0.005f))
+            if (config.enableTunnelMode && _rndGen.RandomBool(0.005f))
             {
                 _walkerMode = MapGeneratorMode.Tunnel;
                 _tunnelRemainingSteps = 15;
@@ -308,7 +308,9 @@ namespace Generator
         {
             FillSpaceWithObstacles(distanceTransformMethod, distanceThreshold);
             GenerateFreeze();
-            SetPlatforms();
+
+            if (config.generatePlatforms)
+                GeneratePlatforms();
         }
 
         public Vector2Int GetCurrentTargetPos()
@@ -380,7 +382,7 @@ namespace Generator
             }
         }
 
-        private void SetPlatforms()
+        private void GeneratePlatforms()
         {
             // very WIP, but kinda works?
             int minPlatformDistance = 200; // an average distance might allow for better platform placement

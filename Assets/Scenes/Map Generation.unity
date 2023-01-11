@@ -277,6 +277,8 @@ MonoBehaviour:
     - {x: 300, y: 100}
     - {x: 300, y: 200}
     - {x: 100, y: 200}
+    generatePlatforms: 0
+    enableTunnelMode: 0
     initPosition: {x: 100, y: 100}
     initKernelSize: 6
     initKernelCircularity: 0.5
