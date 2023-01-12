@@ -9,7 +9,7 @@ namespace MonoBehaviour
     {
         public GameObject squarePrefab;
         public MapGenerator MapGen;
-        public GridDisplay GridDisplay;
+        // public GridDisplay GridDisplay;
 
         [Header("Rendering Config")] public Color hookableColor;
         public Color unhookableColor;
@@ -26,9 +26,9 @@ namespace MonoBehaviour
 
         void Start()
         {
-            GridDisplay = new GridDisplay(squarePrefab, hookableColor, unhookableColor, freezeColor, emptyColor,
-                obstacleColor);
-            GridDisplay.DisplayGrid(new Map(mapWidth, mapHeight)); // display empty map so tiles are initialized TODO: lol
+            // GridDisplay = new GridDisplay(squarePrefab, hookableColor, unhookableColor, freezeColor, emptyColor,
+            //     obstacleColor);
+            // GridDisplay.DisplayGrid(new Map(mapWidth, mapHeight)); // display empty map so tiles are initialized TODO: lol
         }
 
         // Update is called once per frame
@@ -37,7 +37,7 @@ namespace MonoBehaviour
             var map = new Map(mapWidth, mapHeight);
             var kernel = KernelGenerator.GetKernel(kernelSize, circularity);
             map.SetBlocks(mapWidth / 2, mapHeight / 2, kernel, BlockType.Empty);
-            GridDisplay.DisplayGrid(map);
+            // GridDisplay.DisplayGrid(map);
         }
     }
 }

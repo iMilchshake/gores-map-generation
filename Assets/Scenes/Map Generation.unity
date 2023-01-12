@@ -266,6 +266,8 @@ MonoBehaviour:
     freezeColor: {r: 0.011764706, g: 0, b: 0.050980393, a: 0.6666667}
     emptyColor: {r: 1, g: 1, b: 1, a: 0.12156863}
     obstacleColor: {r: 0.4392157, g: 0.67058825, b: 0.4392157, a: 1}
+    platformColor: {r: 0.5943396, g: 0.47005162, b: 0.2214756, a: 1}
+    debugColor: {r: 0, g: 0.6132076, b: 0.59573275, a: 1}
   iterationsPerUpdate: 9000
   testTile: {fileID: 11400000, guid: 90eb860a658bd4844ae85ee037f34897, type: 2}
   tilemap: {fileID: 2122914868}
@@ -273,22 +275,14 @@ MonoBehaviour:
   autoGenerate: 0
   configuration:
     maxIterations: 9000
-    mapHeight: 400
-    mapWidth: 400
+    mapHeight: 200
+    mapWidth: 600
     seed: 1434747710
     targetPositions:
-    - {x: 250, y: 250}
-    - {x: 200, y: 250}
-    - {x: 150, y: 200}
-    - {x: 200, y: 150}
-    - {x: 275, y: 200}
-    - {x: 300, y: 250}
-    - {x: 250, y: 300}
-    - {x: 200, y: 300}
-    - {x: 150, y: 275}
+    - {x: 550, y: 100}
     generatePlatforms: 1
     enableTunnelMode: 0
-    initPosition: {x: 200, y: 200}
+    initPosition: {x: 50, y: 100}
     initKernelSize: 6
     initKernelCircularity: 0.5
     bestMoveProbability: 0.06

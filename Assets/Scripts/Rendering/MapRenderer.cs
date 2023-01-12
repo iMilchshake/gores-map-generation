@@ -15,6 +15,8 @@ namespace Rendering
         public Color freezeColor;
         public Color emptyColor;
         public Color obstacleColor;
+        public Color platformColor;
+        public Color debugColor;
     }
 
     public class MapRenderer
@@ -23,7 +25,7 @@ namespace Rendering
         private Map _currentMap; // map that is currently displayed
         private MapColorPalette _mapColorPalette;
 
-        public MapRenderer(Tile tile, Tilemap tilemap, int height, int width, MapColorPalette mapColorPalette)
+        public MapRenderer(Tile tile, Tilemap tilemap, int width, int height, MapColorPalette mapColorPalette)
         {
             _tilemap = tilemap;
             _mapColorPalette = mapColorPalette;
@@ -53,6 +55,8 @@ namespace Rendering
                     BlockType.Hookable => _mapColorPalette.hookableColor,
                     BlockType.Obstacle => _mapColorPalette.obstacleColor,
                     BlockType.Unhookable => _mapColorPalette.unhookableColor,
+                    BlockType.Platform => _mapColorPalette.platformColor,
+                    BlockType.Debug => _mapColorPalette.debugColor,
                     _ => Color.red
                 });
             }

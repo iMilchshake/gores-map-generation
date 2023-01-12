@@ -37,19 +37,6 @@ namespace Util
 
         public static float[,] DistanceTransform(Map map, DistanceTransformMethod distanceTransformMethod)
         {
-            return distanceTransformMethod switch
-            {
-                DistanceTransformMethod.ChamferScaled => DistanceTransformChamferScaled(map),
-                DistanceTransformMethod.QuasiEuclidean => DistanceTransformSemiEuclidean(map),
-                DistanceTransformMethod.Cityblock => DistanceTransformCityBlock(map),
-                DistanceTransformMethod.Euclidean => DistanceTransformEuclideanApprox(map),
-                _ => DistanceTransformCityBlock(map)
-            };
-        }
-
-        private static float[,] DistanceTransform3X3(Map map, float adjacentCost, float diagonalCost)
-        {
-            // Generic implementation for any 3x3 distance transform depending on adjacent and diagonal costs 
             int width = map.Width;
             int height = map.Height;
 
@@ -62,10 +49,29 @@ namespace Util
                     distance[x, y] = map[x, y] switch
                     {
                         BlockType.Hookable => 0f,
+                        BlockType.Obstacle => 0f,
+                        BlockType.Platform => 0f,
+                        BlockType.Unhookable => 0f,
                         _ => float.MaxValue
                     };
                 }
             }
+
+            return distanceTransformMethod switch
+            {
+                DistanceTransformMethod.ChamferScaled => DistanceTransformChamferScaled(distance),
+                DistanceTransformMethod.QuasiEuclidean => DistanceTransformSemiEuclidean(distance),
+                DistanceTransformMethod.Cityblock => DistanceTransformCityBlock(distance),
+                DistanceTransformMethod.Euclidean => DistanceTransformEuclideanApprox(distance),
+                _ => DistanceTransformCityBlock(distance)
+            };
+        }
+
+        private static float[,] DistanceTransform3X3(float[,] distance, float adjacentCost, float diagonalCost)
+        {
+            // Generic implementation for any 3x3 distance transform depending on adjacent and diagonal costs 
+            int width = distance.GetLength(0);
+            int height = distance.GetLength(1);
 
             // forward pass
             for (int x = 1; x < width - 1; x++) // left to right
@@ -109,41 +115,27 @@ namespace Util
         }
 
 
-        private static float[,] DistanceTransformChamferScaled(Map map)
+        private static float[,] DistanceTransformChamferScaled(float[,] distance)
         {
             // all costs are divided by 3 so calculated distances are on a similar scale
-            return DistanceTransform3X3(map, 1f, 4f / 3f);
+            return DistanceTransform3X3(distance, 1f, 4f / 3f);
         }
 
-        private static float[,] DistanceTransformCityBlock(Map map)
+        private static float[,] DistanceTransformCityBlock(float[,] distance)
         {
-            return DistanceTransform3X3(map, 1f, 2f);
+            return DistanceTransform3X3(distance, 1f, 2f);
         }
 
-        private static float[,] DistanceTransformSemiEuclidean(Map map)
+        private static float[,] DistanceTransformSemiEuclidean(float[,] distance)
         {
-            return DistanceTransform3X3(map, 1f, 1.41f);
+            return DistanceTransform3X3(distance, 1f, 1.41f);
         }
 
-        private static float[,] DistanceTransformEuclideanApprox(Map map)
+        private static float[,] DistanceTransformEuclideanApprox(float[,] distance)
         {
             // approximated euclidean distance transform 
-            int width = map.Width;
-            int height = map.Height;
-
-            // setup distance array 
-            var distance = new float[width, height];
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
-                    distance[x, y] = map[x, y] switch
-                    {
-                        BlockType.Hookable => 0f,
-                        _ => float.MaxValue
-                    };
-                }
-            }
+            int width = distance.GetLength(0);
+            int height = distance.GetLength(1);
 
             int kernelSize = 9; // must be odd
             int kernelMargin = kernelSize / 2;

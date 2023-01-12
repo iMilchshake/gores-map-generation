@@ -39,7 +39,6 @@ namespace MonoBehaviour
     public class MainMapGeneration : UnityEngine.MonoBehaviour
     {
         private MapGenerator _mapGen;
-        private GridDisplay _gridDisplay;
         private Random _seedGenerator;
         private MapRenderer _mapRenderer;
 

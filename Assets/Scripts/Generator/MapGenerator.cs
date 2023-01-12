@@ -289,11 +289,11 @@ namespace Generator
 
         public void OnFinish()
         {
-            FillSpaceWithObstacles(config.distanceTransformMethod, config.distanceThreshold);
-            GenerateFreeze();
-
             if (config.generatePlatforms)
                 GeneratePlatforms();
+
+            FillSpaceWithObstacles(config.distanceTransformMethod, config.distanceThreshold);
+            GenerateFreeze();
         }
 
         public Vector2Int GetCurrentTargetPos()
@@ -390,13 +390,13 @@ namespace Generator
                             x + safeRight, y + safeTop, BlockType.Freeze))
                     {
                         // safe area, place platform
-                        Map[x, y] = BlockType.Hookable;
-                        Map[x - 1, y] = BlockType.Hookable;
-                        Map[x - 2, y] = BlockType.Hookable;
-                        Map[x + 1, y] = BlockType.Hookable;
-                        Map[x + 2, y] = BlockType.Hookable;
-                        Map[x - safeLeft, y - safeDown] = BlockType.Unhookable;
-                        Map[x + safeRight, y + safeTop] = BlockType.Unhookable;
+                        Map[x, y] = BlockType.Platform;
+                        Map[x - 1, y] = BlockType.Platform;
+                        Map[x - 2, y] = BlockType.Platform;
+                        Map[x + 1, y] = BlockType.Platform;
+                        Map[x + 2, y] = BlockType.Platform;
+                        // Map[x - safeLeft, y - safeDown] = BlockType.Debug;
+                        // Map[x + safeRight, y + safeTop] = BlockType.Debug;
 
                         lastPlatformIndex = currentPositionIndex;
                     }

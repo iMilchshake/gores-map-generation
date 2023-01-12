@@ -6,9 +6,10 @@
         Unhookable,
         Freeze,
         Empty,
-        Obstacle
+        Obstacle,
+        Platform,
+        Debug
     }
-
 
     public enum DistanceTransformMethod
     {
