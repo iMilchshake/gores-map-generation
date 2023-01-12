@@ -369,9 +369,11 @@ namespace Generator
         private void GeneratePlatforms()
         {
             // very WIP, but kinda works?
-            int minPlatformDistance = 200; // an average distance might allow for better platform placement
-            int safeDistanceX = 3;
-            int safeDistanceY = 4;
+            int minPlatformDistance = 1000; // an average distance might allow for better platform placement
+            int safeTop = 4;
+            int safeRight = 4;
+            int safeDown = 2;
+            int safeLeft = 4;
 
             int lastPlatformIndex = 0;
             int currentPositionIndex = 0;
@@ -383,19 +385,18 @@ namespace Generator
                 {
                     int x = _positions[currentPositionIndex].x;
                     int y = _positions[currentPositionIndex].y;
-                    if (!Map.CheckTypeInArea(x - safeDistanceX, y - safeDistanceY, x + safeDistanceX, y + safeDistanceY,
-                            BlockType.Hookable) && !Map.CheckTypeInArea(x - safeDistanceX, y - safeDistanceY,
-                            x + safeDistanceX, y + safeDistanceY,
-                            BlockType.Freeze))
+                    if (!Map.CheckTypeInArea(x - safeLeft, y - safeDown, x + safeRight, y + safeTop,
+                            BlockType.Hookable) && !Map.CheckTypeInArea(x - safeLeft, y - safeDown,
+                            x + safeRight, y + safeTop, BlockType.Freeze))
                     {
                         // safe area, place platform
-                        Map[x, y - 3] = BlockType.Hookable;
-                        Map[x - 1, y - 3] = BlockType.Hookable;
-                        Map[x - 2, y - 3] = BlockType.Hookable;
-                        Map[x + 1, y - 3] = BlockType.Hookable;
-                        Map[x + 2, y - 3] = BlockType.Hookable;
-                        // Map[x - safeDistanceX, y - safeDistanceY] = BlockType.Unhookable;
-                        // Map[x + safeDistanceX, y + safeDistanceY] = BlockType.Unhookable;
+                        Map[x, y] = BlockType.Hookable;
+                        Map[x - 1, y] = BlockType.Hookable;
+                        Map[x - 2, y] = BlockType.Hookable;
+                        Map[x + 1, y] = BlockType.Hookable;
+                        Map[x + 2, y] = BlockType.Hookable;
+                        Map[x - safeLeft, y - safeDown] = BlockType.Unhookable;
+                        Map[x + safeRight, y + safeTop] = BlockType.Unhookable;
 
                         lastPlatformIndex = currentPositionIndex;
                     }
