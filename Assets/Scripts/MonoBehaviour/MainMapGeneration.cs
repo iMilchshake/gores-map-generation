@@ -2,6 +2,7 @@ using System;
 using Generator;
 using Rendering;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 using Util;
 using Random = System.Random;
 
@@ -37,17 +38,16 @@ namespace MonoBehaviour
 
     public class MainMapGeneration : UnityEngine.MonoBehaviour
     {
-        public GameObject squarePrefab;
         private MapGenerator _mapGen;
         private GridDisplay _gridDisplay;
         private Random _seedGenerator;
+        private MapRenderer _mapRenderer;
 
-        [Header("Rendering Config")] public Color hookableColor;
-        public Color unhookableColor;
-        public Color freezeColor;
-        public Color emptyColor;
-        public Color obstacleColor;
+        [Header("Rendering Config")] 
+        public MapColorPalette mapColorPalette;
         public int iterationsPerUpdate;
+        public Tile testTile;
+        public Tilemap tilemap;
 
         [Header("Generation Config")] public bool lockSeed;
         public bool autoGenerate;
@@ -59,12 +59,11 @@ namespace MonoBehaviour
 
         void Start()
         {
-            _gridDisplay = new GridDisplay(squarePrefab, hookableColor, unhookableColor, freezeColor, emptyColor,
-                obstacleColor);
-            _gridDisplay.DisplayGrid(new Map(configuration.mapWidth,
-                configuration.mapHeight)); // display empty map so tiles are initialized TODO: lol
             _seedGenerator = new Random(42);
             StartGeneration();
+
+            _mapRenderer = new MapRenderer(testTile, tilemap, configuration.mapWidth, configuration.mapHeight,
+                mapColorPalette);
         }
 
 
@@ -92,15 +91,15 @@ namespace MonoBehaviour
                         _mapGen.WalkerPos.Equals(_mapGen.GetCurrentTargetPos()))
                     {
                         _generating = false;
-                        Debug.Log($"finished with {_currentIteration} iterations");
                         _mapGen.OnFinish();
-                        _gridDisplay.DisplayGrid(_mapGen.Map);
+                        _mapRenderer.DisplayMap(_mapGen.Map);
+                        Debug.Log($"finished with {_currentIteration} iterations");
                         break;
                     }
                 }
 
                 // update display
-                _gridDisplay.DisplayGrid(_mapGen.Map);
+                _mapRenderer.DisplayMap(_mapGen.Map);
             }
         }
 
