@@ -13,7 +13,9 @@
     public enum DistanceTransformMethod
     {
         Cityblock,
-        Chamfer
+        ChamferScaled,
+        QuasiEuclidean,
+        Euclidean
     }
 
     public enum MapGeneratorMode

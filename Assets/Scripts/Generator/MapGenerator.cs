@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using IO;
 using MonoBehaviour;
-using Unity.VisualScripting;
 using UnityEngine;
 using Util;
 
@@ -67,25 +66,9 @@ namespace Generator
             return new Map((BlockType[,])grid.Clone());
         }
 
-        public int[,] GetDistanceMap(DistanceTransformMethod distanceTransformMethod)
+        public float[,] GetDistanceMap(DistanceTransformMethod distanceTransformMethod)
         {
-            // setup distance array 
-            int[,] distance = new int[Width, Height];
-            for (int x = 0; x < Width; x++)
-            {
-                for (int y = 0; y < Height; y++)
-                {
-                    distance[x, y] = grid[x, y] switch
-                    {
-                        BlockType.Hookable => 0,
-                        _ => int.MaxValue
-                    };
-                }
-            }
-
-            // calculate distance transform
-            MathUtil.DistanceTransform(distance, distanceTransformMethod);
-            return distance;
+            return MathUtil.DistanceTransform(this, distanceTransformMethod);
         }
 
         public bool CheckTypeInArea(int x1, int y1, int x2, int y2, BlockType type)
@@ -304,9 +287,9 @@ namespace Generator
                 _walkerTargetPosIndex++;
         }
 
-        public void OnFinish(DistanceTransformMethod distanceTransformMethod, int distanceThreshold)
+        public void OnFinish()
         {
-            FillSpaceWithObstacles(distanceTransformMethod, distanceThreshold);
+            FillSpaceWithObstacles(config.distanceTransformMethod, config.distanceThreshold);
             GenerateFreeze();
 
             if (config.generatePlatforms)
@@ -350,11 +333,11 @@ namespace Generator
         }
 
 
-        private void FillSpaceWithObstacles(DistanceTransformMethod distanceTransformMethod, int distanceThreshold)
+        private void FillSpaceWithObstacles(DistanceTransformMethod distanceTransformMethod, float distanceThreshold)
         {
-            var distances = Map.GetDistanceMap(distanceTransformMethod);
-            var width = distances.GetLength(0);
-            var height = distances.GetLength(1);
+            float[,] distances = Map.GetDistanceMap(distanceTransformMethod);
+            int width = distances.GetLength(0);
+            int height = distances.GetLength(1);
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
@@ -366,6 +349,7 @@ namespace Generator
                 }
             }
         }
+
 
         private void GenerateFreeze()
         {

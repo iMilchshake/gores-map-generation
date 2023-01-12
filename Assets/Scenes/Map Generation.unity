@@ -266,20 +266,27 @@ MonoBehaviour:
   freezeColor: {r: 0.01, g: 0, b: 0.05, a: 0.5}
   emptyColor: {r: 1, g: 1, b: 1, a: 0.1}
   obstacleColor: {r: 0.43916875, g: 0.6698113, b: 0.43916875, a: 1}
-  iterationsPerUpdate: 1000
+  iterationsPerUpdate: 9000
   lockSeed: 0
+  autoGenerate: 0
   configuration:
     maxIterations: 9000
-    mapHeight: 300
+    mapHeight: 400
     mapWidth: 400
-    seed: 42
+    seed: 503774878
     targetPositions:
-    - {x: 300, y: 100}
-    - {x: 300, y: 200}
-    - {x: 100, y: 200}
-    generatePlatforms: 0
+    - {x: 250, y: 250}
+    - {x: 200, y: 250}
+    - {x: 150, y: 200}
+    - {x: 200, y: 150}
+    - {x: 275, y: 200}
+    - {x: 300, y: 250}
+    - {x: 250, y: 300}
+    - {x: 200, y: 300}
+    - {x: 150, y: 275}
+    generatePlatforms: 1
     enableTunnelMode: 0
-    initPosition: {x: 100, y: 100}
+    initPosition: {x: 200, y: 200}
     initKernelSize: 6
     initKernelCircularity: 0.5
     bestMoveProbability: 0.06
@@ -323,8 +330,8 @@ MonoBehaviour:
         Probability: 0.3
       - Circularity: 0.8
         Probability: 0.1
-    distanceTransformMethod: 1
-    distanceThreshold: 22
+    distanceTransformMethod: 3
+    distanceThreshold: 6.32
 --- !u!4 &714146207
 Transform:
   m_ObjectHideFlags: 0

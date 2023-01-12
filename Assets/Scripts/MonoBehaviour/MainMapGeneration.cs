@@ -32,7 +32,7 @@ namespace MonoBehaviour
 
         // obstacle config
         public DistanceTransformMethod distanceTransformMethod;
-        public int distanceThreshold;
+        public float distanceThreshold;
     }
 
     public class MainMapGeneration : UnityEngine.MonoBehaviour
@@ -50,6 +50,7 @@ namespace MonoBehaviour
         public int iterationsPerUpdate;
 
         [Header("Generation Config")] public bool lockSeed;
+        public bool autoGenerate;
         public MapGenerationConfig configuration;
 
         // generation state
@@ -69,7 +70,7 @@ namespace MonoBehaviour
 
         private void Update()
         {
-            if (Input.GetKeyDown("r") && !_generating)
+            if ((autoGenerate || Input.GetKeyDown("r")) && !_generating)
                 StartGeneration();
 
             if (Input.GetKeyDown("e") && !_generating)
@@ -92,7 +93,7 @@ namespace MonoBehaviour
                     {
                         _generating = false;
                         Debug.Log($"finished with {_currentIteration} iterations");
-                        _mapGen.OnFinish(configuration.distanceTransformMethod, configuration.distanceThreshold);
+                        _mapGen.OnFinish();
                         _gridDisplay.DisplayGrid(_mapGen.Map);
                         break;
                     }
