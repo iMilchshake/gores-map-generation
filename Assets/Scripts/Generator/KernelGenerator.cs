@@ -40,13 +40,13 @@ namespace Generator
         private void ValidateConfig()
         {
             var sizeProbabilitySum = config.Sum(c => c.SizeProbability);
-            if (!MathUtil.CheckFloat(sizeProbabilitySum, 1.0f))
+            if (!MathUtil.CheckFloatEqual(sizeProbabilitySum, 1.0f))
                 throw new ArithmeticException("size probabilities dont sum up to 1");
 
             foreach (var sizeConfig in config)
             {
                 var circularityProbabilitySum = sizeConfig.CirularicyProbabilities.Sum(c => c.Probability);
-                if (!MathUtil.CheckFloat(circularityProbabilitySum, 1.0f))
+                if (!MathUtil.CheckFloatEqual(circularityProbabilitySum, 1.0f))
                     throw new ArithmeticException(
                         $"circularity probabilities dont sum up to 1 for size={sizeConfig.Size}");
             }

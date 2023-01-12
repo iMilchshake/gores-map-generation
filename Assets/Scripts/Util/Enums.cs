@@ -13,6 +13,22 @@
     public enum DistanceTransformMethod
     {
         Cityblock,
-        Chamfer
+        ChamferScaled,
+        QuasiEuclidean,
+        Euclidean
+    }
+
+    public enum MapGeneratorMode
+    {
+        DistanceProbability,
+        Tunnel // 
+    }
+
+    public enum Direction
+    {
+        Up,
+        Right,
+        Down,
+        Left
     }
 }

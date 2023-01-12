@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using IO;
+using MonoBehaviour;
 using UnityEngine;
 using Util;
 
@@ -51,8 +52,10 @@ namespace Generator
             {
                 for (var yKernel = 0; yKernel < kernelSize; yKernel++)
                 {
-                    if (kernel[xKernel, yKernel])
-                        grid[xPos + (xKernel - kernelOffset), yPos + (yKernel - kernelOffset)] = type;
+                    int x = xPos + (xKernel - kernelOffset);
+                    int y = yPos + (yKernel - kernelOffset);
+                    if (kernel[xKernel, yKernel] && x > 0 && x < Width && y > 0 && y < Height)
+                        grid[x, y] = type;
                 }
             }
         }
@@ -63,25 +66,9 @@ namespace Generator
             return new Map((BlockType[,])grid.Clone());
         }
 
-        public int[,] GetDistanceMap(DistanceTransformMethod distanceTransformMethod)
+        public float[,] GetDistanceMap(DistanceTransformMethod distanceTransformMethod)
         {
-            // setup distance array 
-            int[,] distance = new int[Width, Height];
-            for (int x = 0; x < Width; x++)
-            {
-                for (int y = 0; y < Height; y++)
-                {
-                    distance[x, y] = grid[x, y] switch
-                    {
-                        BlockType.Hookable => 0,
-                        _ => int.MaxValue
-                    };
-                }
-            }
-
-            // calculate distance transform
-            MathUtil.DistanceTransform(distance, distanceTransformMethod);
-            return distance;
+            return MathUtil.DistanceTransform(this, distanceTransformMethod);
         }
 
         public bool CheckTypeInArea(int x1, int y1, int x2, int y2, BlockType type)
@@ -209,90 +196,109 @@ namespace Generator
 
     public class MapGenerator
     {
+        // config
+        public MapGenerationConfig config;
+
+        // data structures
         public Map Map { get; }
-
-        private readonly int _width;
-        private readonly int _height;
         private RandomGenerator _rndGen;
-        public int Seed;
-
-        public Vector2Int WalkerPos;
-        public Vector2Int[] WalkerTargetPositions;
-        public int WalkerTargetPosIndex = 0;
-
-        private float _bestMoveProbability;
-        private float _kernelSizeChangeProb;
-        private float _kernelCircularityChangeProb;
-
-        public KernelGenerator kernelGenerator;
-        private bool[,] _kernel;
         private List<Vector2Int> _positions;
+        private KernelGenerator _kernelGenerator;
 
+        // walker state
+        public Vector2Int WalkerPos;
+        private bool[,] _kernel;
+        private int _walkerTargetPosIndex = 0;
+        private MapGeneratorMode _walkerMode;
 
-        public MapGenerator(int width, int height, Vector2Int startPos, Vector2Int[] targetPositions,
-            float bestMoveProbability,
-            int kernelSize, float kernelCircularity, float kernelSizeChangeProb, float kernelCircularityChangeProb,
-            KernelSizeConfig[] kernelConfig, int seed)
+        // tunnel mode state
+        private int _tunnelRemainingSteps = 0;
+        private Vector2Int _tunnelLastDir;
+
+        public MapGenerator(MapGenerationConfig config)
         {
-            WalkerPos = startPos;
-            WalkerTargetPositions = targetPositions;
-            Map = new Map(width, height);
+            this.config = config;
 
-            _bestMoveProbability = bestMoveProbability;
-            _kernelSizeChangeProb = kernelSizeChangeProb;
-            _kernelCircularityChangeProb = kernelCircularityChangeProb;
-            _width = width;
-            _height = height;
-            _rndGen = new RandomGenerator(seed);
-            Seed = seed;
-
+            Map = new Map(config.mapWidth, config.mapHeight);
+            _rndGen = new RandomGenerator(config.seed);
             _positions = new List<Vector2Int>();
             _positions.Add(new Vector2Int(WalkerPos.x, WalkerPos.y));
+            _kernelGenerator =
+                new KernelGenerator(config.kernelConfig, config.initKernelSize, config.initKernelCircularity);
 
-            kernelGenerator = new KernelGenerator(kernelConfig, kernelSize, kernelCircularity);
-            _kernel = kernelGenerator.GetCurrentKernel();
+            WalkerPos = config.initPosition;
+            _kernel = _kernelGenerator.GetCurrentKernel();
+            _walkerMode = MapGeneratorMode.DistanceProbability; // start default mode 
+        }
+
+        public int GetSeed()
+        {
+            return config.seed;
+        }
+
+        private Vector2Int StepTunnel()
+        {
+            if (_tunnelRemainingSteps <= 0)
+                _walkerMode = MapGeneratorMode.DistanceProbability;
+            _tunnelRemainingSteps--;
+
+            // update direction
+            if (_rndGen.RandomBool(0.00f))
+            {
+                _tunnelLastDir = _rndGen.PickRandomMove(GetDistanceProbabilities(3));
+            }
+
+            _kernel = KernelGenerator.GetKernel(4, 0.0f);
+            return _tunnelLastDir;
+        }
+
+        private Vector2Int StepDistanceProbabilities()
+        {
+            var distanceProbabilities = GetDistanceProbabilities(3);
+            var pickedMove = _rndGen.PickRandomMove(distanceProbabilities);
+            _kernelGenerator.Mutate(config.kernelSizeChangeProb, config.kernelCircularityChangeProb, _rndGen);
+            if (config.enableTunnelMode && _rndGen.RandomBool(0.005f))
+            {
+                _walkerMode = MapGeneratorMode.Tunnel;
+                _tunnelRemainingSteps = 15;
+                _tunnelLastDir = pickedMove;
+            }
+
+            return pickedMove;
         }
 
         public void Step()
         {
-            // pick a random move based on the distance towards the current target position 
-            var distanceProbabilities = GetDistanceProbabilities(3);
-
-            // hotfix: dont allow diagonal moves TODO: MoveArray requires a proper rework since diagonal moves seem to add no value
-            distanceProbabilities[-1, -1] = 0.0f;
-            distanceProbabilities[1, -1] = 0.0f;
-            distanceProbabilities[-1, 1] = 0.0f;
-            distanceProbabilities[1, 1] = 0.0f;
-            distanceProbabilities[0, 0] = 0.0f;
-            distanceProbabilities.Normalize();
-
-            // pick a move based on the probabilities
-            var pickedMove = _rndGen.PickRandomMove(distanceProbabilities);
+            // calculate next move depending on current _walkerMode
+            Vector2Int pickedMove = _walkerMode switch
+            {
+                MapGeneratorMode.DistanceProbability => StepDistanceProbabilities(),
+                MapGeneratorMode.Tunnel => StepTunnel(),
+                _ => Vector2Int.zero
+            };
 
             // move walker by picked move and remove tiles using a given kernel
             WalkerPos += pickedMove;
             _positions.Add(new Vector2Int(WalkerPos.x, WalkerPos.y));
-            kernelGenerator.Mutate(_kernelSizeChangeProb, _kernelCircularityChangeProb, _rndGen);
-            Map.SetBlocks(WalkerPos.x, WalkerPos.y, kernelGenerator.GetCurrentKernel(), BlockType.Empty);
+            Map.SetBlocks(WalkerPos.x, WalkerPos.y, _kernelGenerator.GetCurrentKernel(), BlockType.Empty);
 
-            // test if current target was reached
-            if (WalkerPos.Equals(GetCurrentTargetPos()) && WalkerTargetPosIndex < WalkerTargetPositions.Length - 1)
-            {
-                Debug.Log($"reached targetPos index={WalkerTargetPosIndex}");
-                WalkerTargetPosIndex++;
-            }
+            // update targetPosition if current one was reached
+            if (WalkerPos.Equals(GetCurrentTargetPos()) && _walkerTargetPosIndex < config.targetPositions.Length - 1)
+                _walkerTargetPosIndex++;
         }
 
-        public void OnFinish(DistanceTransformMethod distanceTransformMethod, int distanceThreshold)
+        public void OnFinish()
         {
-            FillSpaceWithObstacles(distanceTransformMethod, distanceThreshold);
+            FillSpaceWithObstacles(config.distanceTransformMethod, config.distanceThreshold);
             GenerateFreeze();
-            SetPlatforms();
+
+            if (config.generatePlatforms)
+                GeneratePlatforms();
         }
 
         public Vector2Int GetCurrentTargetPos()
         {
-            return WalkerTargetPositions[WalkerTargetPosIndex];
+            return config.targetPositions[_walkerTargetPosIndex];
         }
 
         private MoveArray GetDistanceProbabilities(int moveSize)
@@ -304,8 +310,8 @@ namespace Generator
             // calculate distances for each possible move
             var moveDistances = new float[moveCount];
             for (var moveIndex = 0; moveIndex < moveCount; moveIndex++)
-                moveDistances[moveIndex] = Vector2Int.Distance(WalkerTargetPositions[WalkerTargetPosIndex],
-                    WalkerPos + validMoves[moveIndex]);
+                moveDistances[moveIndex] =
+                    Vector2Int.Distance(GetCurrentTargetPos(), WalkerPos + validMoves[moveIndex]);
 
             // sort moves by their respective distance to the goal
             Array.Sort(moveDistances, validMoves);
@@ -313,18 +319,25 @@ namespace Generator
             // assign each move a probability based on their index in the sorted order
             for (var moveIndex = 0; moveIndex < moveCount; moveIndex++)
                 probabilities[validMoves[moveIndex]] =
-                    MathUtil.GeometricDistribution(moveIndex + 1, _bestMoveProbability);
+                    MathUtil.GeometricDistribution(moveIndex + 1, config.bestMoveProbability);
+
+            // hotfix: dont allow diagonal moves TODO: MoveArray requires a proper rework since diagonal moves seem to add no value
+            probabilities[-1, -1] = 0.0f;
+            probabilities[1, -1] = 0.0f;
+            probabilities[-1, 1] = 0.0f;
+            probabilities[1, 1] = 0.0f;
+            probabilities[0, 0] = 0.0f;
             probabilities.Normalize(); // normalize the probabilities so that they sum up to 1
 
             return probabilities;
         }
 
 
-        private void FillSpaceWithObstacles(DistanceTransformMethod distanceTransformMethod, int distanceThreshold)
+        private void FillSpaceWithObstacles(DistanceTransformMethod distanceTransformMethod, float distanceThreshold)
         {
-            var distances = Map.GetDistanceMap(distanceTransformMethod);
-            var width = distances.GetLength(0);
-            var height = distances.GetLength(1);
+            float[,] distances = Map.GetDistanceMap(distanceTransformMethod);
+            int width = distances.GetLength(0);
+            int height = distances.GetLength(1);
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
@@ -337,12 +350,13 @@ namespace Generator
             }
         }
 
+
         private void GenerateFreeze()
         {
             // iterate over every cell of the map
-            for (var x = 0; x < _width; x++)
+            for (var x = 0; x < config.mapWidth; x++)
             {
-                for (var y = 0; y < _height; y++)
+                for (var y = 0; y < config.mapHeight; y++)
                 {
                     // if a hookable tile is nearby -> set freeze
                     if (Map[x, y] == BlockType.Empty &&
@@ -352,12 +366,14 @@ namespace Generator
             }
         }
 
-        private void SetPlatforms()
+        private void GeneratePlatforms()
         {
             // very WIP, but kinda works?
-            int minPlatformDistance = 200; // an average distance might allow for better platform placement
-            int safeDistanceX = 3;
-            int safeDistanceY = 4;
+            int minPlatformDistance = 1000; // an average distance might allow for better platform placement
+            int safeTop = 4;
+            int safeRight = 4;
+            int safeDown = 2;
+            int safeLeft = 4;
 
             int lastPlatformIndex = 0;
             int currentPositionIndex = 0;
@@ -369,19 +385,18 @@ namespace Generator
                 {
                     int x = _positions[currentPositionIndex].x;
                     int y = _positions[currentPositionIndex].y;
-                    if (!Map.CheckTypeInArea(x - safeDistanceX, y - safeDistanceY, x + safeDistanceX, y + safeDistanceY,
-                            BlockType.Hookable) && !Map.CheckTypeInArea(x - safeDistanceX, y - safeDistanceY,
-                            x + safeDistanceX, y + safeDistanceY,
-                            BlockType.Freeze))
+                    if (!Map.CheckTypeInArea(x - safeLeft, y - safeDown, x + safeRight, y + safeTop,
+                            BlockType.Hookable) && !Map.CheckTypeInArea(x - safeLeft, y - safeDown,
+                            x + safeRight, y + safeTop, BlockType.Freeze))
                     {
                         // safe area, place platform
-                        Map[x, y - 3] = BlockType.Hookable;
-                        Map[x - 1, y - 3] = BlockType.Hookable;
-                        Map[x - 2, y - 3] = BlockType.Hookable;
-                        Map[x + 1, y - 3] = BlockType.Hookable;
-                        Map[x + 2, y - 3] = BlockType.Hookable;
-                        // Map[x - safeDistanceX, y - safeDistanceY] = BlockType.Unhookable;
-                        // Map[x + safeDistanceX, y + safeDistanceY] = BlockType.Unhookable;
+                        Map[x, y] = BlockType.Hookable;
+                        Map[x - 1, y] = BlockType.Hookable;
+                        Map[x - 2, y] = BlockType.Hookable;
+                        Map[x + 1, y] = BlockType.Hookable;
+                        Map[x + 2, y] = BlockType.Hookable;
+                        Map[x - safeLeft, y - safeDown] = BlockType.Unhookable;
+                        Map[x + safeRight, y + safeTop] = BlockType.Unhookable;
 
                         lastPlatformIndex = currentPositionIndex;
                     }

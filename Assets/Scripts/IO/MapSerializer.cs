@@ -137,7 +137,7 @@ namespace IO
                             id = map[x, y] switch
                             {
                                 BlockType.Hookable => 1,
-                                BlockType.Freeze => 144,
+                                BlockType.Freeze => 9,
                                 _ => 0 // empty?
                             },
                             mirrored = false,

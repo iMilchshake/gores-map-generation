@@ -1,68 +1,82 @@
+using System;
 using Generator;
 using Rendering;
-using Unity.Profiling;
 using UnityEngine;
 using Util;
 using Random = System.Random;
 
 namespace MonoBehaviour
 {
+    [Serializable]
+    public struct MapGenerationConfig
+    {
+        // general map config 
+        public int maxIterations;
+        public int mapHeight;
+        public int mapWidth;
+        public int seed;
+        public Vector2Int[] targetPositions;
+        public bool generatePlatforms;
+        public bool enableTunnelMode;
+
+        // initial state
+        public Vector2Int initPosition;
+        public int initKernelSize;
+        public float initKernelCircularity;
+
+        // walker config
+        public float bestMoveProbability;
+        public float kernelSizeChangeProb;
+        public float kernelCircularityChangeProb;
+        public KernelSizeConfig[] kernelConfig;
+
+        // obstacle config
+        public DistanceTransformMethod distanceTransformMethod;
+        public float distanceThreshold;
+    }
+
     public class MainMapGeneration : UnityEngine.MonoBehaviour
     {
         public GameObject squarePrefab;
-        public MapGenerator MapGen;
-        public GridDisplay GridDisplay;
-        public Random SeedGenerator;
+        private MapGenerator _mapGen;
+        private GridDisplay _gridDisplay;
+        private Random _seedGenerator;
 
         [Header("Rendering Config")] public Color hookableColor;
         public Color unhookableColor;
         public Color freezeColor;
         public Color emptyColor;
         public Color obstacleColor;
+        public int iterationsPerUpdate;
 
-        [Header("Initialization Config")] public int iterationsPerUpdate;
-        public int maxIterations;
-        public int mapHeight;
-        public int mapWidth;
-        public int margin;
-        public bool forceSeed;
+        [Header("Generation Config")] public bool lockSeed;
+        public bool autoGenerate;
+        public MapGenerationConfig configuration;
 
-        [Header("Random Walker Config")] public float bestMoveProbability;
-        public float kernelSizeChangeProb;
-        public float kernelCircularityChangeProb;
-        public KernelSizeConfig[] kernelConfig;
-
-        [Header("Obstacle Config")] public DistanceTransformMethod distanceTransformMethod;
-        public int distanceThreshold;
-
-        private int _kernelSize = 3;
-        private float _kernelCircularity = 0.0f;
+        // generation state
         private bool _generating = false;
         private int _currentIteration = 0;
 
-        static readonly ProfilerMarker MarkerMapGenStep = new("MapGeneration.Step");
-        static readonly ProfilerMarker MarkerMapGenFinishStep = new("MapGeneration.FinishStep");
-
         void Start()
         {
-            GridDisplay = new GridDisplay(squarePrefab, hookableColor, unhookableColor, freezeColor, emptyColor,
+            _gridDisplay = new GridDisplay(squarePrefab, hookableColor, unhookableColor, freezeColor, emptyColor,
                 obstacleColor);
-            GridDisplay.DisplayGrid(new Map(mapWidth,
-                mapHeight)); // display empty map so tiles are initialized TODO: lol
-            SeedGenerator = new Random(42);
+            _gridDisplay.DisplayGrid(new Map(configuration.mapWidth,
+                configuration.mapHeight)); // display empty map so tiles are initialized TODO: lol
+            _seedGenerator = new Random(42);
             StartGeneration();
         }
 
 
         private void Update()
         {
-            if (Input.GetKeyDown("r") && !_generating)
+            if ((autoGenerate || Input.GetKeyDown("r")) && !_generating)
                 StartGeneration();
 
             if (Input.GetKeyDown("e") && !_generating)
             {
-                Debug.Log($"exporting map {MapGen.Seed}");
-                MapGen.Map.ExportMap("" + MapGen.Seed);
+                Debug.Log($"exporting map {_mapGen.GetSeed()}");
+                _mapGen.Map.ExportMap("" + _mapGen.GetSeed());
                 Debug.Log("done");
             }
 
@@ -71,47 +85,31 @@ namespace MonoBehaviour
                 // do n update steps (n = iterationsPerUpdate)
                 for (int i = 0; i < iterationsPerUpdate; i++)
                 {
-                    using (MarkerMapGenStep.Auto())
-                    {
-                        MapGen.Step();
-                    }
-
+                    _mapGen.Step();
                     _currentIteration++;
 
-                    if (_currentIteration > maxIterations || MapGen.WalkerPos.Equals(MapGen.GetCurrentTargetPos()))
+                    if (_currentIteration > configuration.maxIterations ||
+                        _mapGen.WalkerPos.Equals(_mapGen.GetCurrentTargetPos()))
                     {
                         _generating = false;
                         Debug.Log($"finished with {_currentIteration} iterations");
-                        MapGen.OnFinish(distanceTransformMethod, distanceThreshold);
-                        GridDisplay.DisplayGrid(MapGen.Map);
-
+                        _mapGen.OnFinish();
+                        _gridDisplay.DisplayGrid(_mapGen.Map);
                         break;
                     }
                 }
 
                 // update display
-                GridDisplay.DisplayGrid(MapGen.Map);
+                _gridDisplay.DisplayGrid(_mapGen.Map);
             }
         }
 
         private void StartGeneration()
         {
-            MapGen = new MapGenerator(mapWidth, mapHeight,
-                new Vector2Int(margin, margin),
-                new[]
-                {
-                    new Vector2Int(mapWidth - margin, margin),
-                    new Vector2Int(mapWidth - margin, mapHeight - margin),
-                    new Vector2Int(margin, mapHeight - margin)
-                },
-                bestMoveProbability,
-                _kernelSize,
-                _kernelCircularity,
-                kernelSizeChangeProb,
-                kernelCircularityChangeProb,
-                kernelConfig,
-                seed: forceSeed ? 0 : SeedGenerator.Next()
-            );
+            if (!lockSeed)
+                configuration.seed = _seedGenerator.Next();
+
+            _mapGen = new MapGenerator(configuration);
             _generating = true;
             _currentIteration = 0;
         }
