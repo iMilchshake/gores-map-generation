@@ -34,6 +34,8 @@ namespace MonoBehaviour
         // obstacle config
         public DistanceTransformMethod distanceTransformMethod;
         public float distanceThreshold;
+        public float preDistanceNoise;
+        public int gridDistance;
     }
 
     public class MainMapGeneration : UnityEngine.MonoBehaviour
@@ -42,8 +44,7 @@ namespace MonoBehaviour
         private Random _seedGenerator;
         private MapRenderer _mapRenderer;
 
-        [Header("Rendering Config")] 
-        public MapColorPalette mapColorPalette;
+        [Header("Rendering Config")] public MapColorPalette mapColorPalette;
         public int iterationsPerUpdate;
         public Tile testTile;
         public Tilemap tilemap;

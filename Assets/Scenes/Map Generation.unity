@@ -271,8 +271,8 @@ MonoBehaviour:
   iterationsPerUpdate: 9000
   testTile: {fileID: 11400000, guid: 90eb860a658bd4844ae85ee037f34897, type: 2}
   tilemap: {fileID: 2122914868}
-  lockSeed: 0
-  autoGenerate: 0
+  lockSeed: 1
+  autoGenerate: 1
   configuration:
     maxIterations: 9000
     mapHeight: 200
@@ -328,6 +328,8 @@ MonoBehaviour:
         Probability: 0.1
     distanceTransformMethod: 3
     distanceThreshold: 5.5
+    preDistanceNoise: 0
+    gridDistance: 10
 --- !u!4 &714146207
 Transform:
   m_ObjectHideFlags: 0

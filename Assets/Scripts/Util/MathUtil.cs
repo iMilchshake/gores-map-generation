@@ -35,7 +35,9 @@ namespace Util
             return baseValue + incraseBy;
         }
 
-        public static float[,] DistanceTransform(Map map, DistanceTransformMethod distanceTransformMethod)
+        public static float[,] DistanceTransform(Map map, DistanceTransformMethod distanceTransformMethod,
+            RandomGenerator rndGen, float preDistanceNoise, int gridDistance)
+
         {
             int width = map.Width;
             int height = map.Height;
@@ -46,6 +48,12 @@ namespace Util
             {
                 for (int y = 0; y < height; y++)
                 {
+                    if (rndGen.RandomBool(preDistanceNoise))
+                    {
+                        distance[x, y] = 0f; // override current distance as zero = "here is a wall"
+                        continue;
+                    }
+
                     distance[x, y] = map[x, y] switch
                     {
                         BlockType.Hookable => 0f,
@@ -57,7 +65,7 @@ namespace Util
                 }
             }
 
-            return distanceTransformMethod switch
+            float[,] distTransform = distanceTransformMethod switch
             {
                 DistanceTransformMethod.ChamferScaled => DistanceTransformChamferScaled(distance),
                 DistanceTransformMethod.QuasiEuclidean => DistanceTransformSemiEuclidean(distance),
@@ -65,6 +73,21 @@ namespace Util
                 DistanceTransformMethod.Euclidean => DistanceTransformEuclideanApprox(distance),
                 _ => DistanceTransformCityBlock(distance)
             };
+
+            // add random noise to distance transform
+            for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
+            {
+                if (x % gridDistance == 0 || (x - 1) % gridDistance == 0 || (x + 1) % gridDistance == 0 ||
+                    (x + 2) % gridDistance == 0)
+                    distTransform[x, y] = 0f;
+
+                if (y % gridDistance == 0 || (y - 1) % gridDistance == 0 || (y + 1) % gridDistance == 0 ||
+                    (y + 2) % gridDistance == 0)
+                    distTransform[x, y] = 0f;
+            }
+
+            return distTransform;
         }
 
         private static float[,] DistanceTransform3X3(float[,] distance, float adjacentCost, float diagonalCost)

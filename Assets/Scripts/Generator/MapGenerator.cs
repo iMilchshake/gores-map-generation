@@ -60,15 +60,9 @@ namespace Generator
             }
         }
 
-
         public Map Clone()
         {
             return new Map((BlockType[,])grid.Clone());
-        }
-
-        public float[,] GetDistanceMap(DistanceTransformMethod distanceTransformMethod)
-        {
-            return MathUtil.DistanceTransform(this, distanceTransformMethod);
         }
 
         public bool CheckTypeInArea(int x1, int y1, int x2, int y2, BlockType type)
@@ -292,7 +286,8 @@ namespace Generator
             if (config.generatePlatforms)
                 GeneratePlatforms();
 
-            FillSpaceWithObstacles(config.distanceTransformMethod, config.distanceThreshold);
+            FillSpaceWithObstacles(config.distanceTransformMethod, config.distanceThreshold, config.preDistanceNoise,
+                config.gridDistance);
             GenerateFreeze();
         }
 
@@ -333,9 +328,11 @@ namespace Generator
         }
 
 
-        private void FillSpaceWithObstacles(DistanceTransformMethod distanceTransformMethod, float distanceThreshold)
+        private void FillSpaceWithObstacles(DistanceTransformMethod distanceTransformMethod, float distanceThreshold,
+            float preDistanceNoise, int gridDistance)
         {
-            float[,] distances = Map.GetDistanceMap(distanceTransformMethod);
+            float[,] distances =
+                MathUtil.DistanceTransform(Map, distanceTransformMethod, _rndGen, preDistanceNoise, gridDistance);
             int width = distances.GetLength(0);
             int height = distances.GetLength(1);
             for (int x = 0; x < width; x++)
