@@ -37,7 +37,6 @@ namespace Util
 
         public static float[,] DistanceTransform(Map map, DistanceTransformMethod distanceTransformMethod,
             RandomGenerator rndGen, float preDistanceNoise, int gridDistance)
-
         {
             int width = map.Width;
             int height = map.Height;
@@ -74,20 +73,34 @@ namespace Util
                 _ => DistanceTransformCityBlock(distance)
             };
 
-            // add random noise to distance transform
-            for (int x = 0; x < width; x++)
-            for (int y = 0; y < height; y++)
-            {
-                if (x % gridDistance == 0 || (x - 1) % gridDistance == 0 || (x + 1) % gridDistance == 0 ||
-                    (x + 2) % gridDistance == 0)
-                    distTransform[x, y] = 0f;
-
-                if (y % gridDistance == 0 || (y - 1) % gridDistance == 0 || (y + 1) % gridDistance == 0 ||
-                    (y + 2) % gridDistance == 0)
-                    distTransform[x, y] = 0f;
-            }
+            AddGridTunnels(distTransform, gridDistance);
 
             return distTransform;
+        }
+
+        private static void AddGridTunnels(float[,] distTransform, int gridDistance)
+        {
+            int width = distTransform.GetLength(0);
+            int height = distTransform.GetLength(1);
+
+            // add tunnels to distance transform by "carving out" a grid
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    if (x % gridDistance == 0 ||
+                        (x - 1) % gridDistance == 0 ||
+                        (x + 1) % gridDistance == 0 ||
+                        (x + 2) % gridDistance == 0)
+                        distTransform[x, y] = 0f;
+
+                    if (y % gridDistance == 0 ||
+                        (y - 1) % gridDistance == 0 ||
+                        (y + 1) % gridDistance == 0 ||
+                        (y + 2) % gridDistance == 0)
+                        distTransform[x, y] = 0f;
+                }
+            }
         }
 
         private static float[,] DistanceTransform3X3(float[,] distance, float adjacentCost, float diagonalCost)
@@ -157,10 +170,8 @@ namespace Util
         // approximated euclidean distance transform 
         private static float[,] DistanceTransformEuclideanApprox(float[,] distance, int kernelSize)
         {
-            if (kernelSize % 2 != 0)
-            {
-                throw new ArgumentException("Kernel size must be an even number");
-            }
+            if (kernelSize % 2 == 0)
+                throw new ArgumentException("Kernel size must be odd");
 
             int width = distance.GetLength(0);
             int height = distance.GetLength(1);

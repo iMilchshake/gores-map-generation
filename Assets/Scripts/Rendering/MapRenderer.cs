@@ -1,6 +1,5 @@
 ﻿using System;
 using Generator;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Util;

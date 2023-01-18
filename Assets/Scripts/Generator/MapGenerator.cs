@@ -283,12 +283,11 @@ namespace Generator
 
         public void OnFinish()
         {
-            if (config.generatePlatforms)
-                GeneratePlatforms();
-
             FillSpaceWithObstacles(config.distanceTransformMethod, config.distanceThreshold, config.preDistanceNoise,
                 config.gridDistance);
             GenerateFreeze();
+            if (config.generatePlatforms)
+                GeneratePlatforms();
         }
 
         public Vector2Int GetCurrentTargetPos()
@@ -365,11 +364,11 @@ namespace Generator
 
         private void GeneratePlatforms()
         {
-            // very WIP, but kinda works?
+            // very WIP, but kinda works? TODO: add parameters to config 
             int minPlatformDistance = 1000; // an average distance might allow for better platform placement
             int safeTop = 4;
             int safeRight = 4;
-            int safeDown = 2;
+            int safeDown = 0;
             int safeLeft = 4;
 
             int lastPlatformIndex = 0;
@@ -382,25 +381,48 @@ namespace Generator
                 {
                     int x = _positions[currentPositionIndex].x;
                     int y = _positions[currentPositionIndex].y;
-                    if (!Map.CheckTypeInArea(x - safeLeft, y - safeDown, x + safeRight, y + safeTop,
-                            BlockType.Hookable) && !Map.CheckTypeInArea(x - safeLeft, y - safeDown,
-                            x + safeRight, y + safeTop, BlockType.Freeze))
+                    if (!CheckPlatformArea(x, y, safeLeft, safeTop, safeRight, safeDown))
                     {
-                        // safe area, place platform
-                        Map[x, y] = BlockType.Platform;
-                        Map[x - 1, y] = BlockType.Platform;
-                        Map[x - 2, y] = BlockType.Platform;
-                        Map[x + 1, y] = BlockType.Platform;
-                        Map[x + 2, y] = BlockType.Platform;
-                        // Map[x - safeLeft, y - safeDown] = BlockType.Debug;
-                        // Map[x + safeRight, y + safeTop] = BlockType.Debug;
-
-                        lastPlatformIndex = currentPositionIndex;
+                        currentPositionIndex++;
+                        continue;
                     }
+
+                    Map[x - safeLeft, y - safeDown] = BlockType.Debug;
+                    Map[x + safeRight, y + safeTop] = BlockType.Debug;
+
+                    // move platform area down until it hits a wall
+                    bool movedDown = false;
+                    while (CheckPlatformArea(x, y, safeLeft, safeTop, safeRight, safeDown))
+                    {
+                        y--;
+                        movedDown = true;
+                    }
+
+                    Map[x - safeLeft, (movedDown ? y + 1 : y) - safeDown] = BlockType.Unhookable;
+                    Map[x + safeRight, (movedDown ? y + 1 : y) + safeTop] = BlockType.Unhookable;
+
+                    // place platform at last safe position
+                    PlacePlatform(x, movedDown ? y + 1 : y);
+                    lastPlatformIndex = currentPositionIndex;
                 }
 
                 currentPositionIndex++;
             }
+        }
+
+        private bool CheckPlatformArea(int x, int y, int safeLeft, int safeTop, int safeRight, int safeDown)
+        {
+            return !Map.CheckTypeInArea(x - safeLeft, y - safeDown, x + safeRight, y + safeTop, BlockType.Hookable) &&
+                   !Map.CheckTypeInArea(x - safeLeft, y - safeDown, x + safeRight, y + safeTop, BlockType.Freeze);
+        }
+
+        private void PlacePlatform(int x, int y)
+        {
+            Map[x, y] = BlockType.Platform;
+            Map[x - 1, y] = BlockType.Platform;
+            Map[x - 2, y] = BlockType.Platform;
+            Map[x + 1, y] = BlockType.Platform;
+            Map[x + 2, y] = BlockType.Platform;
         }
     }
 }
