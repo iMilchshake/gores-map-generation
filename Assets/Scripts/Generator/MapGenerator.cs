@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using IO;
 using MonoBehaviour;
 using UnityEngine;
@@ -97,94 +98,49 @@ namespace Generator
 
     public class MoveArray
     {
-        private float[,] _values;
-        private readonly int _size;
+        public Vector2Int[] moves;
+        public float[] probabilities;
+        public readonly int size;
 
-        public MoveArray(int size)
+        public MoveArray(bool allowDiagonal)
         {
-            _values = new float[size, size];
-            _size = size;
-        }
+            size = allowDiagonal ? 8 : 4;
+            moves = new Vector2Int[size];
+            probabilities = new float[size];
 
-        public float this[int x, int y]
-        {
-            get => _values[MoveIndexToArrayIndex(x), MoveIndexToArrayIndex(y)];
-            set => _values[MoveIndexToArrayIndex(x), MoveIndexToArrayIndex(y)] = value;
-        }
-
-        public float this[Vector2Int vec]
-        {
-            get => this[vec.x, vec.y];
-            set => this[vec.x, vec.y] = value;
-        }
-
-        private int MoveIndexToArrayIndex(int x)
-        {
-            // since _probabilities is squared, this function works for x and y
-            var centerX = (_size - 1) / 2;
-            return centerX + x;
-        }
-
-        public Vector2Int[] GetAllValidMoves()
-        {
-            var validMoves = new Vector2Int[_size * _size];
-            var index = 0;
-            for (var x = 0; x < _size; x++)
+            int index = 0;
+            for (int x = -1; x <= 1; x++)
             {
-                for (var y = 0; y < _size; y++)
+                for (int y = -1; y <= 1; y++)
                 {
-                    validMoves[index] = new Vector2Int(x - (_size - 1) / 2, y - (_size - 1) / 2);
-                    index++;
+                    if (x == 0 && y == 0) // skip (0,0) move
+                        continue;
+
+                    if (!allowDiagonal && x != 0 && y != 0) // skip diagonal moves, if disallowed
+                        continue;
+
+                    moves[index++] = new Vector2Int(x, y);
                 }
             }
-
-            return validMoves;
         }
 
         public void Normalize()
         {
-            var sum = Sum();
-            for (var x = 0; x < _size; x++)
+            float sum = Sum();
+            for (int i = 0; i < size; i++)
             {
-                for (var y = 0; y < _size; y++)
-                {
-                    _values[x, y] /= sum;
-                }
+                probabilities[i] /= sum;
             }
-        }
-
-        public float MaxValue()
-        {
-            var maxValue = float.MinValue;
-            for (var x = 0; x < _size; x++)
-            {
-                for (var y = 0; y < _size; y++)
-                {
-                    if (_values[x, y] > maxValue)
-                        maxValue = _values[x, y];
-                }
-            }
-
-            return maxValue;
         }
 
         public float Sum()
         {
-            float sum = 0;
-            for (var x = 0; x < _size; x++)
-            {
-                for (var y = 0; y < _size; y++)
-                {
-                    sum += _values[x, y];
-                }
-            }
-
-            return sum;
+            return probabilities.Sum();
         }
 
         public override String ToString()
         {
-            return ArrayUtils.Array2DToString(_values);
+            return $"{moves}, {probabilities}";
         }
     }
 
@@ -239,7 +195,7 @@ namespace Generator
             // update direction
             if (_rndGen.RandomBool(0.00f))
             {
-                _tunnelLastDir = _rndGen.PickRandomMove(GetDistanceProbabilities(3));
+                _tunnelLastDir = _rndGen.PickRandomMove(GetDistanceProbabilities());
             }
 
             _kernel = KernelGenerator.GetKernel(4, 0.0f);
@@ -248,7 +204,7 @@ namespace Generator
 
         private Vector2Int StepDistanceProbabilities()
         {
-            var distanceProbabilities = GetDistanceProbabilities(3);
+            var distanceProbabilities = GetDistanceProbabilities();
             var pickedMove = _rndGen.PickRandomMove(distanceProbabilities);
             _kernelGenerator.Mutate(config.kernelSizeChangeProb, config.kernelCircularityChangeProb, _rndGen);
             if (config.enableTunnelMode && _rndGen.RandomBool(0.005f))
@@ -295,35 +251,26 @@ namespace Generator
             return config.targetPositions[_walkerTargetPosIndex];
         }
 
-        private MoveArray GetDistanceProbabilities(int moveSize)
+        private MoveArray GetDistanceProbabilities()
         {
-            var moveCount = moveSize * moveSize;
-            var probabilities = new MoveArray(moveSize);
-            var validMoves = probabilities.GetAllValidMoves();
+            var moveArray = new MoveArray(allowDiagonal: false);
 
             // calculate distances for each possible move
-            var moveDistances = new float[moveCount];
-            for (var moveIndex = 0; moveIndex < moveCount; moveIndex++)
+            var moveDistances = new float[moveArray.size];
+            for (var moveIndex = 0; moveIndex < moveArray.size; moveIndex++)
                 moveDistances[moveIndex] =
-                    Vector2Int.Distance(GetCurrentTargetPos(), WalkerPos + validMoves[moveIndex]);
+                    Vector2Int.Distance(GetCurrentTargetPos(), WalkerPos + moveArray.moves[moveIndex]);
 
             // sort moves by their respective distance to the goal
-            Array.Sort(moveDistances, validMoves);
+            Array.Sort(moveDistances, moveArray.moves);
 
             // assign each move a probability based on their index in the sorted order
-            for (var moveIndex = 0; moveIndex < moveCount; moveIndex++)
-                probabilities[validMoves[moveIndex]] =
-                    MathUtil.GeometricDistribution(moveIndex + 1, config.bestMoveProbability);
+            for (var i = 0; i < moveArray.size; i++)
+                moveArray.probabilities[i] = MathUtil.GeometricDistribution(i + 1, config.bestMoveProbability);
 
-            // hotfix: dont allow diagonal moves TODO: MoveArray requires a proper rework since diagonal moves seem to add no value
-            probabilities[-1, -1] = 0.0f;
-            probabilities[1, -1] = 0.0f;
-            probabilities[-1, 1] = 0.0f;
-            probabilities[1, 1] = 0.0f;
-            probabilities[0, 0] = 0.0f;
-            probabilities.Normalize(); // normalize the probabilities so that they sum up to 1
+            moveArray.Normalize(); // normalize the probabilities so that they sum up to 1
 
-            return probabilities;
+            return moveArray;
         }
 
 

@@ -18,24 +18,12 @@ namespace Generator
             return new Vector2Int(_rnd.Next(-1, 2), _rnd.Next(-1, 2)); // returns one of [-1, 0, 1] for x and y
         }
 
-        public Vector2Int PickRandomMove(MoveArray moves)
+        public Vector2Int PickRandomMove(MoveArray moveArray)
         {
-            if (Math.Abs(moves.Sum() - 1.0f) > 1e-5)
+            if (Math.Abs(moveArray.Sum() - 1.0f) > 1e-5)
                 throw new Exception("probability doesnt sum up to 1");
 
-            // this is a shitty way of flattening the 2D array TODO: update this when MoveArray gets reworked!
-            var probabilities = new float[9];
-            var index = 0;
-            for (var x = -1; x <= 1; x++)
-            {
-                for (var y = -1; y <= 1; y++)
-                {
-                    probabilities[index] = moves[x, y];
-                    index++;
-                }
-            }
-
-            return RandomRouletteSelect(moves.GetAllValidMoves(), probabilities);
+            return RandomRouletteSelect(moveArray.moves, moveArray.probabilities);
         }
 
 
