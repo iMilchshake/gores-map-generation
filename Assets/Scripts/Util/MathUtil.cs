@@ -70,7 +70,7 @@ namespace Util
                 DistanceTransformMethod.ChamferScaled => DistanceTransformChamferScaled(distance),
                 DistanceTransformMethod.QuasiEuclidean => DistanceTransformSemiEuclidean(distance),
                 DistanceTransformMethod.Cityblock => DistanceTransformCityBlock(distance),
-                DistanceTransformMethod.Euclidean => DistanceTransformEuclideanApprox(distance),
+                DistanceTransformMethod.Euclidean => DistanceTransformEuclideanApprox(distance, 9),
                 _ => DistanceTransformCityBlock(distance)
             };
 
@@ -154,13 +154,16 @@ namespace Util
             return DistanceTransform3X3(distance, 1f, 1.41f);
         }
 
-        private static float[,] DistanceTransformEuclideanApprox(float[,] distance)
+        // approximated euclidean distance transform 
+        private static float[,] DistanceTransformEuclideanApprox(float[,] distance, int kernelSize)
         {
-            // approximated euclidean distance transform 
+            if (kernelSize % 2 != 0)
+            {
+                throw new ArgumentException("Kernel size must be an even number");
+            }
+
             int width = distance.GetLength(0);
             int height = distance.GetLength(1);
-
-            int kernelSize = 9; // must be odd
             int kernelMargin = kernelSize / 2;
 
             // forward pass
