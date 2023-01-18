@@ -31,6 +31,11 @@ namespace MonoBehaviour
         public float kernelCircularityChangeProb;
         public KernelSizeConfig[] kernelConfig;
 
+        // tunnel config TODO: lengths should depend on width
+        public float tunnelProbability;
+        public int[] tunnelLengths;
+        public int[] tunnelWidths;
+
         // obstacle config
         public DistanceTransformMethod distanceTransformMethod;
         public float distanceThreshold;

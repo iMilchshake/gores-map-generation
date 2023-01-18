@@ -22,16 +22,16 @@ namespace Generator
     public class KernelGenerator
     {
         public KernelSizeConfig[] config;
-        public float circularity;
-        public int size;
-        private bool[,] currentKernel;
+        private float _circularity;
+        private int _size;
+        private bool[,] _currentKernel;
 
         public KernelGenerator(KernelSizeConfig[] config, int size, float circularity)
         {
             this.config = config;
-            this.circularity = circularity;
-            this.size = size;
-            currentKernel = GetKernel(size, this.circularity);
+            this._circularity = circularity;
+            this._size = size;
+            _currentKernel = GetKernel(size, this._circularity);
 
             ValidateConfig();
         }
@@ -62,30 +62,30 @@ namespace Generator
                 var probabilities = config.Select(c => c.SizeProbability).ToArray();
                 var sizes = config.Select(c => c.Size).ToArray();
                 var selectedSize = rndGen.RandomRouletteSelect(sizes, probabilities);
-                size = selectedSize;
+                _size = selectedSize;
             }
 
             if (updateCircularity)
             {
                 // get correct sizeConfig
-                var index = Array.FindIndex(config, sizeConfig => sizeConfig.Size == size);
+                var index = Array.FindIndex(config, sizeConfig => sizeConfig.Size == _size);
 
                 var circularities = config[index].CirularicyProbabilities.Select(c => c.Circularity).ToArray();
                 var probabilities = config[index].CirularicyProbabilities.Select(c => c.Probability).ToArray();
                 var selectedCircularity = rndGen.RandomRouletteSelect(circularities, probabilities);
-                circularity = selectedCircularity;
+                _circularity = selectedCircularity;
             }
 
             // if a change occured -> update current kernel
             if (updateSize || updateCircularity)
             {
-                currentKernel = GetKernel(size, circularity);
+                _currentKernel = GetKernel(_size, _circularity);
             }
         }
 
         public bool[,] GetCurrentKernel()
         {
-            return currentKernel;
+            return _currentKernel;
         }
 
         public static bool[,] GetKernel(int size, float circularity)
@@ -111,6 +111,13 @@ namespace Generator
             }
 
             return kernel;
+        }
+
+        public void ForceKernelConfig(int size, float circularity)
+        {
+            _size = size;
+            _circularity = circularity;
+            _currentKernel = GetKernel(size, circularity);
         }
     }
 }

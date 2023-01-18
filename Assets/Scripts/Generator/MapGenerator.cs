@@ -160,10 +160,11 @@ namespace Generator
         private bool[,] _kernel;
         private int _walkerTargetPosIndex = 0;
         private MapGeneratorMode _walkerMode;
+        private int stepCount;
 
         // tunnel mode state
         private int _tunnelRemainingSteps = 0;
-        private Vector2Int _tunnelLastDir;
+        private Vector2Int _tunnelDir;
 
         public MapGenerator(MapGenerationConfig config)
         {
@@ -189,17 +190,12 @@ namespace Generator
         private Vector2Int StepTunnel()
         {
             if (_tunnelRemainingSteps <= 0)
-                _walkerMode = MapGeneratorMode.DistanceProbability;
-            _tunnelRemainingSteps--;
-
-            // update direction
-            if (_rndGen.RandomBool(0.00f))
             {
-                _tunnelLastDir = _rndGen.PickRandomMove(GetDistanceProbabilities());
+                _walkerMode = MapGeneratorMode.DistanceProbability;
             }
 
-            _kernel = KernelGenerator.GetKernel(4, 0.0f);
-            return _tunnelLastDir;
+            _tunnelRemainingSteps--;
+            return _tunnelDir;
         }
 
         private Vector2Int StepDistanceProbabilities()
@@ -207,11 +203,14 @@ namespace Generator
             var distanceProbabilities = GetDistanceProbabilities();
             var pickedMove = _rndGen.PickRandomMove(distanceProbabilities);
             _kernelGenerator.Mutate(config.kernelSizeChangeProb, config.kernelCircularityChangeProb, _rndGen);
-            if (config.enableTunnelMode && _rndGen.RandomBool(0.005f))
+
+            // switch to tunnel mode with a certain probability TODO: state pattern?
+            if (config.enableTunnelMode && _rndGen.RandomBool(config.tunnelProbability))
             {
                 _walkerMode = MapGeneratorMode.Tunnel;
-                _tunnelRemainingSteps = 15;
-                _tunnelLastDir = pickedMove;
+                _tunnelRemainingSteps = _rndGen.RandomChoice(config.tunnelLengths);
+                _kernelGenerator.ForceKernelConfig(size: _rndGen.RandomChoice(config.tunnelWidths), circularity: 0.0f);
+                _tunnelDir = GetBestMove();
             }
 
             return pickedMove;
@@ -235,6 +234,8 @@ namespace Generator
             // update targetPosition if current one was reached
             if (WalkerPos.Equals(GetCurrentTargetPos()) && _walkerTargetPosIndex < config.targetPositions.Length - 1)
                 _walkerTargetPosIndex++;
+
+            stepCount++;
         }
 
         public void OnFinish()
@@ -271,6 +272,26 @@ namespace Generator
             moveArray.Normalize(); // normalize the probabilities so that they sum up to 1
 
             return moveArray;
+        }
+
+        private Vector2Int GetBestMove()
+        {
+            var moveArray = new MoveArray(allowDiagonal: false);
+
+            // calculate distances for each possible move
+            Vector2Int bestMove = Vector2Int.zero;
+            float bestDistance = float.MaxValue;
+            for (var moveIndex = 0; moveIndex < moveArray.size; moveIndex++)
+            {
+                float distance = Vector2Int.Distance(GetCurrentTargetPos(), WalkerPos + moveArray.moves[moveIndex]);
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    bestMove = moveArray.moves[moveIndex];
+                }
+            }
+
+            return bestMove;
         }
 
 

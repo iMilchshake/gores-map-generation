@@ -268,21 +268,31 @@ MonoBehaviour:
     obstacleColor: {r: 0.4392157, g: 0.67058825, b: 0.4392157, a: 1}
     platformColor: {r: 0.5943396, g: 0.47005162, b: 0.2214756, a: 1}
     debugColor: {r: 0, g: 0.6132076, b: 0.59573275, a: 1}
-  iterationsPerUpdate: 9001
+  iterationsPerUpdate: 15001
   testTile: {fileID: 11400000, guid: 90eb860a658bd4844ae85ee037f34897, type: 2}
   tilemap: {fileID: 2122914868}
   lockSeed: 0
   autoGenerate: 0
   configuration:
-    maxIterations: 9000
-    mapHeight: 200
-    mapWidth: 600
-    seed: 42
+    maxIterations: 30000
+    mapHeight: 500
+    mapWidth: 500
+    seed: 1487325104
     targetPositions:
-    - {x: 550, y: 100}
+    - {x: 450, y: 50}
+    - {x: 350, y: 200}
+    - {x: 350, y: 100}
+    - {x: 300, y: 100}
+    - {x: 300, y: 150}
+    - {x: 250, y: 150}
+    - {x: 250, y: 100}
+    - {x: 200, y: 100}
+    - {x: 200, y: 200}
+    - {x: 125, y: 200}
+    - {x: 50, y: 100}
     generatePlatforms: 1
-    enableTunnelMode: 0
-    initPosition: {x: 50, y: 100}
+    enableTunnelMode: 1
+    initPosition: {x: 50, y: 50}
     initKernelSize: 6
     initKernelCircularity: 0.5
     bestMoveProbability: 0.12
@@ -290,26 +300,26 @@ MonoBehaviour:
     kernelCircularityChangeProb: 0.5
     kernelConfig:
     - Size: 3
-      SizeProbability: 0.05
+      SizeProbability: 0
       CirularicyProbabilities:
       - Circularity: 0
         Probability: 1
     - Size: 4
-      SizeProbability: 0.5
+      SizeProbability: 0.4
       CirularicyProbabilities:
       - Circularity: 0
         Probability: 0.8
       - Circularity: 0.5
         Probability: 0.2
     - Size: 5
-      SizeProbability: 0.25
+      SizeProbability: 0.3
       CirularicyProbabilities:
       - Circularity: 0
         Probability: 0.75
       - Circularity: 0.5
         Probability: 0.25
     - Size: 6
-      SizeProbability: 0.1
+      SizeProbability: 0.2
       CirularicyProbabilities:
       - Circularity: 0
         Probability: 0.6
@@ -326,10 +336,13 @@ MonoBehaviour:
         Probability: 0.3
       - Circularity: 0.8
         Probability: 0.1
+    tunnelProbability: 0.008
+    tunnelLengths: 080000000c000000
+    tunnelWidths: 04000000050000000500000005000000
     distanceTransformMethod: 3
     distanceThreshold: 5.5
-    preDistanceNoise: 0
-    gridDistance: 15
+    preDistanceNoise: 0.001
+    gridDistance: 25
 --- !u!4 &714146207
 Transform:
   m_ObjectHideFlags: 0
