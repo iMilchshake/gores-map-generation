@@ -59,7 +59,10 @@ namespace Rendering
                     BlockType.Unhookable => _mapColorPalette.unhookableColor,
                     BlockType.Platform => _mapColorPalette.platformColor,
                     BlockType.Debug => _mapColorPalette.debugColor,
-                    _ => Color.red
+                    BlockType.Start => _mapColorPalette.startColor,
+                    BlockType.Finish => _mapColorPalette.finishColor,
+                    BlockType.Spawn => _mapColorPalette.spawnColor,
+                    _ => throw new ArgumentOutOfRangeException()
                 });
             }
 

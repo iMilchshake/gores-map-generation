@@ -242,7 +242,18 @@ namespace Generator
         {
             FillSpaceWithObstacles(config.distanceTransformMethod, config.distanceThreshold, config.preDistanceNoise,
                 config.gridDistance);
+
+            PlaceRoom(WalkerPos.x, WalkerPos.y, 15, 15, 0, 0, BlockType.Finish);
+            PlaceRoom(config.initPosition.x, config.initPosition.y, 15, 15, 0, 0, BlockType.Start);
+            PlacePlatform(WalkerPos.x, WalkerPos.y);
+            PlacePlatform(config.initPosition.x, config.initPosition.y);
+            Map[config.initPosition.x, config.initPosition.y + 1] = BlockType.Spawn;
+
             GenerateFreeze();
+
+            PlaceRoomBorder(WalkerPos.x, WalkerPos.y, 15, 15, 1, 1, BlockType.Finish);
+            PlaceRoomBorder(config.initPosition.x, config.initPosition.y, 15, 15, 1, 1, BlockType.Start);
+
             if (config.generatePlatforms)
                 GeneratePlatforms();
         }
@@ -391,6 +402,43 @@ namespace Generator
             Map[x - 2, y] = BlockType.Platform;
             Map[x + 1, y] = BlockType.Platform;
             Map[x + 2, y] = BlockType.Platform;
+        }
+
+        private void PlaceRoom(int xCenter, int yCenter, int width, int height, int xMargin, int yMargin,
+            BlockType type)
+        {
+            for (int x = 0; x <= width; x++)
+            {
+                for (int y = 0; y <= height; y++)
+                {
+                    int xPos = xCenter + x - (width / 2);
+                    int yPos = yCenter + y - (height / 2);
+                    Map[xPos, yPos] = BlockType.Empty;
+                }
+            }
+        }
+
+        private void PlaceRoomBorder(int xCenter, int yCenter, int width, int height, int xMargin, int yMargin,
+            BlockType type)
+        {
+            int marginWidth = width + 2 * xMargin;
+            int marginHeight = height + 2 * yMargin;
+
+            for (int x = 0; x <= marginWidth; x++)
+            {
+                for (int y = 0; y <= marginHeight; y++)
+                {
+                    int xPos = xCenter + x - marginWidth / 2;
+                    int yPos = yCenter + y - marginHeight / 2;
+                    if (x == 0 || x == marginWidth || y == 0 || y == marginHeight)
+                    {
+                        if (Map[xPos, yPos] == BlockType.Empty)
+                        {
+                            Map[xPos, yPos] = type;
+                        }
+                    }
+                }
+            }
         }
     }
 }
