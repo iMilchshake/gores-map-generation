@@ -22,7 +22,7 @@
         Euclidean
     }
 
-    public enum MapGeneratorMode
+    public enum MapGeneratorState
     {
         DistanceProbability,
         Tunnel

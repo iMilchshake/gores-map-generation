@@ -159,7 +159,7 @@ namespace Generator
         public Vector2Int WalkerPos;
         private bool[,] _kernel;
         private int _walkerTargetPosIndex = 0;
-        private MapGeneratorMode _walkerMode;
+        private MapGeneratorState _walkerState;
         private int stepCount;
         public bool finished;
 
@@ -180,7 +180,7 @@ namespace Generator
 
             WalkerPos = config.initPosition;
             _kernel = _kernelGenerator.GetCurrentKernel();
-            _walkerMode = MapGeneratorMode.DistanceProbability; // start default mode 
+            _walkerState = MapGeneratorState.DistanceProbability; // start default mode 
         }
 
         public int GetSeed()
@@ -192,7 +192,7 @@ namespace Generator
         {
             if (_tunnelRemainingSteps <= 0)
             {
-                _walkerMode = MapGeneratorMode.DistanceProbability;
+                _walkerState = MapGeneratorState.DistanceProbability;
             }
 
             _tunnelRemainingSteps--;
@@ -208,7 +208,7 @@ namespace Generator
             // switch to tunnel mode with a certain probability TODO: state pattern?
             if (config.enableTunnelMode && _rndGen.RandomBool(config.tunnelProbability))
             {
-                _walkerMode = MapGeneratorMode.Tunnel;
+                _walkerState = MapGeneratorState.Tunnel;
                 _tunnelRemainingSteps = _rndGen.RandomChoice(config.tunnelLengths);
                 _kernelGenerator.ForceKernelConfig(size: _rndGen.RandomChoice(config.tunnelWidths), circularity: 0.0f);
                 _tunnelDir = GetBestMove();
@@ -223,10 +223,10 @@ namespace Generator
                 throw new Exception("Map generation already finished");
 
             // calculate next move depending on current _walkerMode
-            Vector2Int pickedMove = _walkerMode switch
+            Vector2Int pickedMove = _walkerState switch
             {
-                MapGeneratorMode.DistanceProbability => StepDistanceProbabilities(),
-                MapGeneratorMode.Tunnel => StepTunnel(),
+                MapGeneratorState.DistanceProbability => StepDistanceProbabilities(),
+                MapGeneratorState.Tunnel => StepTunnel(),
                 _ => throw new ArgumentOutOfRangeException()
             };
 
@@ -236,8 +236,6 @@ namespace Generator
             Map.SetBlocks(WalkerPos.x, WalkerPos.y, _kernelGenerator.GetCurrentKernel(), BlockType.Empty);
 
             // update targetPosition if current one was reached
-            // bool targetReached = WalkerPos.Equals(GetCurrentTargetPos());
-
             Vector2Int currentTarget = GetCurrentTargetPos();
             bool targetReached = Math.Abs(WalkerPos.x - currentTarget.x) + Math.Abs(WalkerPos.y - currentTarget.y) <=
                                  config.waypointReachedDistance;
@@ -383,9 +381,6 @@ namespace Generator
                         continue;
                     }
 
-                    Map[x - safeLeft, y - safeDown] = BlockType.Debug;
-                    Map[x + safeRight, y + safeTop] = BlockType.Debug;
-
                     // move platform area down until it hits a wall
                     bool movedDown = false;
                     while (CheckPlatformArea(x, y, safeLeft, safeTop, safeRight, safeDown))
@@ -393,9 +388,6 @@ namespace Generator
                         y--;
                         movedDown = true;
                     }
-
-                    Map[x - safeLeft, (movedDown ? y + 1 : y) - safeDown] = BlockType.Unhookable;
-                    Map[x + safeRight, (movedDown ? y + 1 : y) + safeTop] = BlockType.Unhookable;
 
                     // place platform at last safe position
                     PlacePlatform(x, movedDown ? y + 1 : y);

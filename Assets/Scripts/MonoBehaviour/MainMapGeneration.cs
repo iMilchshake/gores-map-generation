@@ -72,7 +72,6 @@ namespace MonoBehaviour
                 mapColorPalette);
         }
 
-
         private void Update()
         {
             if ((autoGenerate || Input.GetKeyDown("r")) && !_generating)

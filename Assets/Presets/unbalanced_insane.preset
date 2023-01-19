@@ -1,0 +1,563 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!181963792 &2655988077585873504
+Preset:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: unbalanced_insane
+  m_TargetType:
+    m_NativeTypeID: 114
+    m_ManagedTypePPtr: {fileID: 11500000, guid: 638337a04fb234b4cbc478754b815550, type: 3}
+    m_ManagedTypeFallback: 
+  m_Properties:
+  - target: {fileID: 0}
+    propertyPath: m_Enabled
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_EditorHideFlags
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_EditorClassIdentifier
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.hookableColor.r
+    value: 0.8117647
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.hookableColor.g
+    value: 0.67058825
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.hookableColor.b
+    value: 0.3882353
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.hookableColor.a
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.unhookableColor.r
+    value: 0.2901961
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.unhookableColor.g
+    value: 0.4509804
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.unhookableColor.b
+    value: 0.5019608
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.unhookableColor.a
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.freezeColor.r
+    value: 0.011764706
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.freezeColor.g
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.freezeColor.b
+    value: 0.050980393
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.freezeColor.a
+    value: 0.6666667
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.emptyColor.r
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.emptyColor.g
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.emptyColor.b
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.emptyColor.a
+    value: 0.12156863
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.obstacleColor.r
+    value: 0.4392157
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.obstacleColor.g
+    value: 0.67058825
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.obstacleColor.b
+    value: 0.4392157
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.obstacleColor.a
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.platformColor.r
+    value: 0.5943396
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.platformColor.g
+    value: 0.47005162
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.platformColor.b
+    value: 0.2214756
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.platformColor.a
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.debugColor.r
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.debugColor.g
+    value: 0.6132076
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.debugColor.b
+    value: 0.59573275
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.debugColor.a
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.startColor.r
+    value: 0.3787586
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.startColor.g
+    value: 0.8773585
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.startColor.b
+    value: 0.29383236
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.startColor.a
+    value: 0.54509807
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.finishColor.r
+    value: 0.745283
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.finishColor.g
+    value: 0.2917853
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.finishColor.b
+    value: 0.36674345
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.finishColor.a
+    value: 0.54509807
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.spawnColor.r
+    value: 0.10524208
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.spawnColor.g
+    value: 0.25235626
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.spawnColor.b
+    value: 0.5188679
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: mapColorPalette.spawnColor.a
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: iterationsPerUpdate
+    value: 15001
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: testTile
+    value: 
+    objectReference: {fileID: 11400000, guid: 90eb860a658bd4844ae85ee037f34897, type: 2}
+  - target: {fileID: 0}
+    propertyPath: tilemap
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: lockSeed
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: autoGenerate
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.maxIterations
+    value: 30000
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.mapHeight
+    value: 600
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.mapWidth
+    value: 600
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.seed
+    value: 317314903
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.targetPositions.Array.size
+    value: 11
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.targetPositions.Array.data[0].x
+    value: 400
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.targetPositions.Array.data[0].y
+    value: 300
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.targetPositions.Array.data[1].x
+    value: 450
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.targetPositions.Array.data[1].y
+    value: 350
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.targetPositions.Array.data[2].x
+    value: 150
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.targetPositions.Array.data[2].y
+    value: 350
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.targetPositions.Array.data[3].x
+    value: 150
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.targetPositions.Array.data[3].y
+    value: 300
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.targetPositions.Array.data[4].x
+    value: 300
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.targetPositions.Array.data[4].y
+    value: 250
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.targetPositions.Array.data[5].x
+    value: 500
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.targetPositions.Array.data[5].y
+    value: 250
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.targetPositions.Array.data[6].x
+    value: 550
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.targetPositions.Array.data[6].y
+    value: 300
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.targetPositions.Array.data[7].x
+    value: 450
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.targetPositions.Array.data[7].y
+    value: 400
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.targetPositions.Array.data[8].x
+    value: 150
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.targetPositions.Array.data[8].y
+    value: 400
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.targetPositions.Array.data[9].x
+    value: 50
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.targetPositions.Array.data[9].y
+    value: 350
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.targetPositions.Array.data[10].x
+    value: 50
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.targetPositions.Array.data[10].y
+    value: 300
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.generatePlatforms
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.enableTunnelMode
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.initPosition.x
+    value: 300
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.initPosition.y
+    value: 300
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.initKernelSize
+    value: 6
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.initKernelCircularity
+    value: 0.5
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.bestMoveProbability
+    value: 0.08
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelSizeChangeProb
+    value: 0.5
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelCircularityChangeProb
+    value: 0.3
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.waypointReachedDistance
+    value: 5
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.size
+    value: 5
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[0].Size
+    value: 3
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[0].SizeProbability
+    value: 0.5
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[0].CirularicyProbabilities.Array.size
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[0].CirularicyProbabilities.Array.data[0].Circularity
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[0].CirularicyProbabilities.Array.data[0].Probability
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[1].Size
+    value: 4
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[1].SizeProbability
+    value: 0.5
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[1].CirularicyProbabilities.Array.size
+    value: 2
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[1].CirularicyProbabilities.Array.data[0].Circularity
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[1].CirularicyProbabilities.Array.data[0].Probability
+    value: 0.8
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[1].CirularicyProbabilities.Array.data[1].Circularity
+    value: 0.5
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[1].CirularicyProbabilities.Array.data[1].Probability
+    value: 0.2
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[2].Size
+    value: 5
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[2].SizeProbability
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[2].CirularicyProbabilities.Array.size
+    value: 2
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[2].CirularicyProbabilities.Array.data[0].Circularity
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[2].CirularicyProbabilities.Array.data[0].Probability
+    value: 0.75
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[2].CirularicyProbabilities.Array.data[1].Circularity
+    value: 0.5
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[2].CirularicyProbabilities.Array.data[1].Probability
+    value: 0.25
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[3].Size
+    value: 6
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[3].SizeProbability
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[3].CirularicyProbabilities.Array.size
+    value: 3
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[3].CirularicyProbabilities.Array.data[0].Circularity
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[3].CirularicyProbabilities.Array.data[0].Probability
+    value: 0.6
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[3].CirularicyProbabilities.Array.data[1].Circularity
+    value: 0.35
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[3].CirularicyProbabilities.Array.data[1].Probability
+    value: 0.3
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[3].CirularicyProbabilities.Array.data[2].Circularity
+    value: 0.8
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[3].CirularicyProbabilities.Array.data[2].Probability
+    value: 0.1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[4].Size
+    value: 7
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[4].SizeProbability
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[4].CirularicyProbabilities.Array.size
+    value: 3
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[4].CirularicyProbabilities.Array.data[0].Circularity
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[4].CirularicyProbabilities.Array.data[0].Probability
+    value: 0.6
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[4].CirularicyProbabilities.Array.data[1].Circularity
+    value: 0.35
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[4].CirularicyProbabilities.Array.data[1].Probability
+    value: 0.3
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[4].CirularicyProbabilities.Array.data[2].Circularity
+    value: 0.8
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.kernelConfig.Array.data[4].CirularicyProbabilities.Array.data[2].Probability
+    value: 0.1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.tunnelProbability
+    value: 0.01
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.tunnelLengths.Array.size
+    value: 3
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.tunnelLengths.Array.data[0]
+    value: 4
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.tunnelLengths.Array.data[1]
+    value: 6
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.tunnelLengths.Array.data[2]
+    value: 8
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.tunnelWidths.Array.size
+    value: 4
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.tunnelWidths.Array.data[0]
+    value: 3
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.tunnelWidths.Array.data[1]
+    value: 3
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.tunnelWidths.Array.data[2]
+    value: 4
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.tunnelWidths.Array.data[3]
+    value: 5
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.distanceTransformMethod
+    value: 3
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.distanceThreshold
+    value: 4.5
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.preDistanceNoise
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: configuration.gridDistance
+    value: 25
+    objectReference: {fileID: 0}
+  m_ExcludedProperties: []
