@@ -301,6 +301,7 @@ MonoBehaviour:
     bestMoveProbability: 0.12
     kernelSizeChangeProb: 0.2
     kernelCircularityChangeProb: 0.5
+    waypointReachedDistance: 0
     kernelConfig:
     - Size: 3
       SizeProbability: 0

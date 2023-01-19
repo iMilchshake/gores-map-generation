@@ -29,6 +29,7 @@ namespace MonoBehaviour
         public float bestMoveProbability;
         public float kernelSizeChangeProb;
         public float kernelCircularityChangeProb;
+        public int waypointReachedDistance;
         public KernelSizeConfig[] kernelConfig;
 
         // tunnel config TODO: lengths should depend on width
@@ -92,8 +93,7 @@ namespace MonoBehaviour
                     _mapGen.Step();
                     _currentIteration++;
 
-                    if (_currentIteration > configuration.maxIterations ||
-                        _mapGen.WalkerPos.Equals(_mapGen.GetCurrentTargetPos()))
+                    if (_currentIteration > configuration.maxIterations || _mapGen.finished)
                     {
                         _generating = false;
                         _mapGen.OnFinish();

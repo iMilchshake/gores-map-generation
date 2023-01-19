@@ -139,6 +139,9 @@ namespace IO
                                 BlockType.Hookable => 1,
                                 BlockType.Platform => 1,
                                 BlockType.Freeze => 9,
+                                BlockType.Finish => 34,
+                                BlockType.Start => 33,
+                                BlockType.Spawn => 192,
                                 _ => 0 // empty?
                             },
                             mirrored = false,

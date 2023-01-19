@@ -161,6 +161,7 @@ namespace Generator
         private int _walkerTargetPosIndex = 0;
         private MapGeneratorMode _walkerMode;
         private int stepCount;
+        public bool finished;
 
         // tunnel mode state
         private int _tunnelRemainingSteps = 0;
@@ -218,12 +219,15 @@ namespace Generator
 
         public void Step()
         {
+            if (finished)
+                throw new Exception("Map generation already finished");
+
             // calculate next move depending on current _walkerMode
             Vector2Int pickedMove = _walkerMode switch
             {
                 MapGeneratorMode.DistanceProbability => StepDistanceProbabilities(),
                 MapGeneratorMode.Tunnel => StepTunnel(),
-                _ => Vector2Int.zero
+                _ => throw new ArgumentOutOfRangeException()
             };
 
             // move walker by picked move and remove tiles using a given kernel
@@ -232,8 +236,21 @@ namespace Generator
             Map.SetBlocks(WalkerPos.x, WalkerPos.y, _kernelGenerator.GetCurrentKernel(), BlockType.Empty);
 
             // update targetPosition if current one was reached
-            if (WalkerPos.Equals(GetCurrentTargetPos()) && _walkerTargetPosIndex < config.targetPositions.Length - 1)
+            // bool targetReached = WalkerPos.Equals(GetCurrentTargetPos());
+
+            Vector2Int currentTarget = GetCurrentTargetPos();
+            bool targetReached = Math.Abs(WalkerPos.x - currentTarget.x) + Math.Abs(WalkerPos.y - currentTarget.y) <=
+                                 config.waypointReachedDistance;
+
+            bool targetsLeft = _walkerTargetPosIndex < config.targetPositions.Length - 1;
+            if (targetsLeft && targetReached)
+            {
                 _walkerTargetPosIndex++;
+            }
+            else if (!targetsLeft && targetReached)
+            {
+                finished = true;
+            }
 
             stepCount++;
         }
