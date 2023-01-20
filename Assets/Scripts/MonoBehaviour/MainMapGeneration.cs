@@ -66,10 +66,10 @@ namespace MonoBehaviour
         void Start()
         {
             _seedGenerator = new Random(42);
-            StartGeneration();
-
             _mapRenderer = new MapRenderer(testTile, tilemap, configuration.mapWidth, configuration.mapHeight,
                 mapColorPalette);
+
+            StartGeneration();
         }
 
         private void Update()
@@ -113,6 +113,8 @@ namespace MonoBehaviour
                 configuration.seed = _seedGenerator.Next();
 
             _mapGen = new MapGenerator(configuration);
+            _mapRenderer.UpdateColorMap(mapColorPalette);
+            Debug.Log("" + mapColorPalette.reservedFreezeColor);
             _generating = true;
             _currentIteration = 0;
         }

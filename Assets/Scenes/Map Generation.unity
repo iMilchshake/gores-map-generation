@@ -209,7 +209,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 200, y: 75, z: -0.5}
+  m_LocalPosition: {x: 300, y: 300, z: -0.5}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -267,11 +267,12 @@ MonoBehaviour:
     emptyColor: {r: 1, g: 1, b: 1, a: 0}
     obstacleColor: {r: 0.4392157, g: 0.67058825, b: 0.4392157, a: 1}
     platformColor: {r: 0.5943396, g: 0.47005162, b: 0.2214756, a: 1}
-    debugColor: {r: 0, g: 0.6132076, b: 0.59573275, a: 1}
+    debugColor: {r: 0.735849, g: 0.03818085, b: 0.0706545, a: 0.7490196}
     startColor: {r: 0.3787586, g: 0.8773585, b: 0.29383236, a: 0.54509807}
     finishColor: {r: 0.745283, g: 0.2917853, b: 0.36674345, a: 0.54509807}
     spawnColor: {r: 0.10524208, g: 0.25235626, b: 0.5188679, a: 1}
-  iterationsPerUpdate: 15001
+    reservedFreezeColor: {r: 0.011764706, g: 0, b: 0.050980393, a: 0.9490196}
+  iterationsPerUpdate: 30001
   testTile: {fileID: 11400000, guid: 90eb860a658bd4844ae85ee037f34897, type: 2}
   tilemap: {fileID: 2122914868}
   lockSeed: 0
@@ -529,7 +530,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1637550584}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 290, y: 328, z: 0}
+  m_LocalPosition: {x: 300, y: 328, z: 1}
   m_LocalScale: {x: 28.0253, y: 28.0253, z: 28.0253}
   m_ConstrainProportionsScale: 0
   m_Children: []

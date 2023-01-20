@@ -58,6 +58,8 @@ namespace Util
                         BlockType.Hookable => 0f,
                         BlockType.Obstacle => 0f,
                         BlockType.Platform => 0f,
+                        BlockType.Freeze => 0f,
+                        BlockType.ReservedFreeze => 0f,
                         BlockType.Unhookable => 0f,
                         _ => float.MaxValue
                     };

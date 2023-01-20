@@ -44,7 +44,7 @@ namespace Generator
             MapSerializer.ExportMap(this, name);
         }
 
-        public void SetBlocks(int xPos, int yPos, bool[,] kernel, BlockType type)
+        public void SetBlocks(int xPos, int yPos, bool[,] kernel, BlockType type, bool updateBlocksOnly)
         {
             var kernelOffset = (kernel.GetLength(0) - 1) / 2;
             var kernelSize = kernel.GetLength(0);
@@ -55,8 +55,12 @@ namespace Generator
                 {
                     int x = xPos + (xKernel - kernelOffset);
                     int y = yPos + (yKernel - kernelOffset);
-                    if (kernel[xKernel, yKernel] && x > 0 && x < Width && y > 0 && y < Height)
-                        grid[x, y] = type;
+                    if (kernel[xKernel, yKernel] && // only update if the kernel is true
+                        x > 0 && x < Width && y > 0 && y < Height && // Check if in bounds
+                        (!updateBlocksOnly || grid[x, y] == BlockType.Hookable)) // Only update hookable blocks
+                    {
+                        grid[x, y] = type; // TODO: save setter?
+                    }
                 }
             }
         }
@@ -176,7 +180,7 @@ namespace Generator
             _positions = new List<Vector2Int>();
             _positions.Add(new Vector2Int(WalkerPos.x, WalkerPos.y));
             _kernelGenerator =
-                new KernelGenerator(config.kernelConfig, config.initKernelSize, config.initKernelCircularity);
+                new KernelGenerator(config.kernelConfig, config.initKernelSize, config.initKernelCircularity, _rndGen);
 
             WalkerPos = config.initPosition;
             _kernel = _kernelGenerator.GetCurrentKernel();
@@ -203,7 +207,7 @@ namespace Generator
         {
             var distanceProbabilities = GetDistanceProbabilities();
             var pickedMove = _rndGen.PickRandomMove(distanceProbabilities);
-            _kernelGenerator.Mutate(config.kernelSizeChangeProb, config.kernelCircularityChangeProb, _rndGen);
+            _kernelGenerator.Mutate(config.kernelSizeChangeProb, config.kernelCircularityChangeProb);
 
             // switch to tunnel mode with a certain probability TODO: state pattern?
             if (config.enableTunnelMode && _rndGen.RandomBool(config.tunnelProbability))
@@ -233,7 +237,14 @@ namespace Generator
             // move walker by picked move and remove tiles using a given kernel
             WalkerPos += pickedMove;
             _positions.Add(new Vector2Int(WalkerPos.x, WalkerPos.y));
-            Map.SetBlocks(WalkerPos.x, WalkerPos.y, _kernelGenerator.GetCurrentKernel(), BlockType.Empty);
+
+            // apply outer kernel (update freeze, only override walls)
+            Map.SetBlocks(WalkerPos.x, WalkerPos.y, _kernelGenerator.GetCurrentOuterKernel(), BlockType.ReservedFreeze,
+                updateBlocksOnly: true);
+
+            // apply inner kernel (set as empty)
+            Map.SetBlocks(WalkerPos.x, WalkerPos.y, _kernelGenerator.GetCurrentKernel(), BlockType.Empty,
+                updateBlocksOnly: false);
 
             // update targetPosition if current one was reached
             Vector2Int currentTarget = GetCurrentTargetPos();
@@ -350,8 +361,11 @@ namespace Generator
                 {
                     // if a hookable tile is nearby -> set freeze
                     if (Map[x, y] == BlockType.Empty &&
-                        Map.CheckTypeInArea(x - 1, y - 1, x + 1, y + 1, BlockType.Hookable))
+                        (Map.CheckTypeInArea(x - 1, y - 1, x + 1, y + 1, BlockType.Hookable) ||
+                         Map.CheckTypeInArea(x - 1, y - 1, x + 1, y + 1, BlockType.ReservedFreeze)))
+                    {
                         Map[x, y] = BlockType.Freeze;
+                    }
                 }
             }
         }

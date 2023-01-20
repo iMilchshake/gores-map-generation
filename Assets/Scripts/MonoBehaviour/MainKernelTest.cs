@@ -8,6 +8,7 @@ namespace MonoBehaviour
     public class MainKernelTest : UnityEngine.MonoBehaviour
     {
         public GameObject squarePrefab;
+
         public MapGenerator MapGen;
         // public GridDisplay GridDisplay;
 
@@ -36,7 +37,7 @@ namespace MonoBehaviour
         {
             var map = new Map(mapWidth, mapHeight);
             var kernel = KernelGenerator.GetKernel(kernelSize, circularity);
-            map.SetBlocks(mapWidth / 2, mapHeight / 2, kernel, BlockType.Empty);
+            // map.SetBlocks(mapWidth / 2, mapHeight / 2, kernel, BlockType.Empty);
             // GridDisplay.DisplayGrid(map);
         }
     }

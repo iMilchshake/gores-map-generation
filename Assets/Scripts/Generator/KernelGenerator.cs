@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using UnityEngine.PlayerLoop;
 using Util;
 
 namespace Generator
@@ -22,18 +23,21 @@ namespace Generator
     public class KernelGenerator
     {
         public KernelSizeConfig[] config;
+        private RandomGenerator _rndGen;
         private float _circularity;
         private int _size;
         private bool[,] _currentKernel;
+        private bool[,] _currentOuterKernel;
 
-        public KernelGenerator(KernelSizeConfig[] config, int size, float circularity)
+        public KernelGenerator(KernelSizeConfig[] config, int size, float circularity, RandomGenerator rndGen)
         {
             this.config = config;
-            this._circularity = circularity;
-            this._size = size;
-            _currentKernel = GetKernel(size, this._circularity);
+            _rndGen = rndGen;
+            _circularity = circularity;
+            _size = size;
 
             ValidateConfig();
+            UpdateKernel();
         }
 
         // sanity check -> do all probabilities sum up to 1? Yes this is useful, i already fucked them up 3 times now help
@@ -52,16 +56,16 @@ namespace Generator
             }
         }
 
-        public void Mutate(float sizeUpdateProbability, float circularityUpdateProbability, RandomGenerator rndGen)
+        public void Mutate(float sizeUpdateProbability, float circularityUpdateProbability)
         {
-            var updateSize = rndGen.RandomBool(sizeUpdateProbability);
-            var updateCircularity = rndGen.RandomBool(circularityUpdateProbability);
+            var updateSize = _rndGen.RandomBool(sizeUpdateProbability);
+            var updateCircularity = _rndGen.RandomBool(circularityUpdateProbability);
 
             if (updateSize)
             {
                 var probabilities = config.Select(c => c.SizeProbability).ToArray();
                 var sizes = config.Select(c => c.Size).ToArray();
-                var selectedSize = rndGen.RandomRouletteSelect(sizes, probabilities);
+                var selectedSize = _rndGen.RandomRouletteSelect(sizes, probabilities);
                 _size = selectedSize;
             }
 
@@ -72,20 +76,34 @@ namespace Generator
 
                 var circularities = config[index].CirularicyProbabilities.Select(c => c.Circularity).ToArray();
                 var probabilities = config[index].CirularicyProbabilities.Select(c => c.Probability).ToArray();
-                var selectedCircularity = rndGen.RandomRouletteSelect(circularities, probabilities);
+                var selectedCircularity = _rndGen.RandomRouletteSelect(circularities, probabilities);
                 _circularity = selectedCircularity;
             }
 
             // if a change occured -> update current kernel
             if (updateSize || updateCircularity)
             {
-                _currentKernel = GetKernel(_size, _circularity);
+                UpdateKernel();
             }
+        }
+
+        private void UpdateKernel()
+        {
+            _currentKernel = GetKernel(_size, _circularity);
+            _currentOuterKernel = GetKernel(_size + _rndGen.RandomChoice(new[] { 0, 0, 0, 0, 0, 0, 0, 0, 2 }),
+                _rndGen.RandomChoice(new[] { 0.0f, _circularity, _circularity, _circularity, _circularity }));
+            // _currentOuterKernel = GetKernel(_size + 2, 0.0f);
+            // _currentOuterKernel = GetKernel(_size + 2, 0.0f);
         }
 
         public bool[,] GetCurrentKernel()
         {
             return _currentKernel;
+        }
+
+        public bool[,] GetCurrentOuterKernel()
+        {
+            return _currentOuterKernel;
         }
 
         public static bool[,] GetKernel(int size, float circularity)
@@ -117,7 +135,7 @@ namespace Generator
         {
             _size = size;
             _circularity = circularity;
-            _currentKernel = GetKernel(size, circularity);
+            UpdateKernel();
         }
     }
 }

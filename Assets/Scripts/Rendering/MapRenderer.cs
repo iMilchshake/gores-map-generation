@@ -19,6 +19,7 @@ namespace Rendering
         public Color startColor;
         public Color finishColor;
         public Color spawnColor;
+        public Color reservedFreezeColor;
     }
 
     public class MapRenderer
@@ -62,11 +63,17 @@ namespace Rendering
                     BlockType.Start => _mapColorPalette.startColor,
                     BlockType.Finish => _mapColorPalette.finishColor,
                     BlockType.Spawn => _mapColorPalette.spawnColor,
+                    BlockType.ReservedFreeze => _mapColorPalette.reservedFreezeColor,
                     _ => throw new ArgumentOutOfRangeException()
                 });
             }
 
             _currentMap = map.Clone(); // save map for next render update
+        }
+
+        public void UpdateColorMap(MapColorPalette mapColorPalette)
+        {
+            _mapColorPalette = mapColorPalette;
         }
     }
 }
