@@ -269,16 +269,16 @@ namespace Generator
             FillSpaceWithObstacles(config.distanceTransformMethod, config.distanceThreshold, config.preDistanceNoise,
                 config.gridDistance);
 
-            PlaceRoom(WalkerPos.x, WalkerPos.y, 15, 15, 0, 0, BlockType.Finish);
-            PlaceRoom(config.initPosition.x, config.initPosition.y, 15, 15, 0, 0, BlockType.Start);
+            GenerateFreeze();
+
+            PlaceRoom(WalkerPos.x, WalkerPos.y, 10, 10, 0, 0, BlockType.Finish);
+            PlaceRoom(config.initPosition.x, config.initPosition.y, 10, 10, 0, 0, BlockType.Start);
             PlacePlatform(WalkerPos.x, WalkerPos.y);
             PlacePlatform(config.initPosition.x, config.initPosition.y);
             Map[config.initPosition.x, config.initPosition.y + 1] = BlockType.Spawn;
 
-            GenerateFreeze();
-
-            PlaceRoomBorder(WalkerPos.x, WalkerPos.y, 15, 15, 1, 1, BlockType.Finish);
-            PlaceRoomBorder(config.initPosition.x, config.initPosition.y, 15, 15, 1, 1, BlockType.Start);
+            PlaceRoomBorder(WalkerPos.x, WalkerPos.y, 10, 10, 1, 1, BlockType.Finish);
+            PlaceRoomBorder(config.initPosition.x, config.initPosition.y, 10, 10, 1, 1, BlockType.Start);
 
             if (config.generatePlatforms)
                 GeneratePlatforms();
@@ -455,7 +455,9 @@ namespace Generator
                     int yPos = yCenter + y - marginHeight / 2;
                     if (x == 0 || x == marginWidth || y == 0 || y == marginHeight)
                     {
-                        if (Map[xPos, yPos] == BlockType.Empty)
+                        if (Map[xPos, yPos] == BlockType.Empty ||
+                            Map[xPos, yPos] == BlockType.Freeze ||
+                            Map[xPos, yPos] == BlockType.MarginFreeze)
                         {
                             Map[xPos, yPos] = type;
                         }
