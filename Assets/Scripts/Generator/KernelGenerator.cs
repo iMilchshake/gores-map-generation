@@ -92,8 +92,6 @@ namespace Generator
             _currentKernel = GetKernel(_size, _circularity);
             _currentOuterKernel = GetKernel(_size + _rndGen.RandomChoice(new[] { 0, 0, 0, 0, 0, 0, 0, 0, 2 }),
                 _rndGen.RandomChoice(new[] { 0.0f, _circularity, _circularity, _circularity, _circularity }));
-            // _currentOuterKernel = GetKernel(_size + 2, 0.0f);
-            // _currentOuterKernel = GetKernel(_size + 2, 0.0f);
         }
 
         public bool[,] GetCurrentKernel()

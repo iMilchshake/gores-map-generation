@@ -85,6 +85,21 @@ namespace Generator
             return false;
         }
 
+        public bool CheckAnyInArea(int x1, int y1, int x2, int y2)
+        {
+            // returns True if type is at least present once in the area
+            for (var x = x1; x <= x2; x++)
+            {
+                for (var y = y1; y <= y2; y++)
+                {
+                    if (grid[x, y].IsAny())
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
         public BlockType[,] GetCellNeighbors(int xPos, int yPos)
         {
             var neighbors = new BlockType[3, 3];
@@ -359,7 +374,6 @@ namespace Generator
             {
                 for (var y = 0; y < config.mapHeight; y++)
                 {
-                    // if a hookable tile is nearby -> set freeze
                     if (Map[x, y] == BlockType.Empty &&
                         (Map.CheckTypeInArea(x - 1, y - 1, x + 1, y + 1, BlockType.Hookable) ||
                          Map.CheckTypeInArea(x - 1, y - 1, x + 1, y + 1, BlockType.MarginFreeze)))
@@ -376,7 +390,7 @@ namespace Generator
             int minPlatformDistance = 1000; // an average distance might allow for better platform placement
             int safeTop = 4;
             int safeRight = 4;
-            int safeDown = 0;
+            int safeDown = 1;
             int safeLeft = 4;
 
             int lastPlatformIndex = 0;
@@ -414,8 +428,7 @@ namespace Generator
 
         private bool CheckPlatformArea(int x, int y, int safeLeft, int safeTop, int safeRight, int safeDown)
         {
-            return !Map.CheckTypeInArea(x - safeLeft, y - safeDown, x + safeRight, y + safeTop, BlockType.Hookable) &&
-                   !Map.CheckTypeInArea(x - safeLeft, y - safeDown, x + safeRight, y + safeTop, BlockType.Freeze);
+            return !Map.CheckAnyInArea(x - safeLeft, y - safeDown, x + safeRight, y + safeTop);
         }
 
         private void PlacePlatform(int x, int y)
@@ -455,9 +468,7 @@ namespace Generator
                     int yPos = yCenter + y - marginHeight / 2;
                     if (x == 0 || x == marginWidth || y == 0 || y == marginHeight)
                     {
-                        if (Map[xPos, yPos] == BlockType.Empty ||
-                            Map[xPos, yPos] == BlockType.Freeze ||
-                            Map[xPos, yPos] == BlockType.MarginFreeze)
+                        if (Map[xPos, yPos].IsFreezeOrEmpty())
                         {
                             Map[xPos, yPos] = type;
                         }
