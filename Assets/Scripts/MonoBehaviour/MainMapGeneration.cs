@@ -29,6 +29,8 @@ namespace MonoBehaviour
         public float bestMoveProbability;
         public float kernelSizeChangeProb;
         public float kernelCircularityChangeProb;
+        public float kernelOuterSizeMarginProb;
+        public float kernelOuterCircularityProb;
         public int waypointReachedDistance;
         public KernelSizeConfig[] kernelConfig;
 

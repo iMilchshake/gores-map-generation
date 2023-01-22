@@ -212,6 +212,7 @@ namespace Generator
             if (_tunnelRemainingSteps <= 0)
             {
                 _walkerState = MapGeneratorState.DistanceProbability;
+                _kernelGenerator.Mutate(config);
             }
 
             _tunnelRemainingSteps--;
@@ -222,14 +223,15 @@ namespace Generator
         {
             var distanceProbabilities = GetDistanceProbabilities();
             var pickedMove = _rndGen.PickRandomMove(distanceProbabilities);
-            _kernelGenerator.Mutate(config.kernelSizeChangeProb, config.kernelCircularityChangeProb);
+            _kernelGenerator.Mutate(config);
 
             // switch to tunnel mode with a certain probability TODO: state pattern?
             if (config.enableTunnelMode && _rndGen.RandomBool(config.tunnelProbability))
             {
                 _walkerState = MapGeneratorState.Tunnel;
                 _tunnelRemainingSteps = _rndGen.RandomChoice(config.tunnelLengths);
-                _kernelGenerator.ForceKernelConfig(size: _rndGen.RandomChoice(config.tunnelWidths), circularity: 0.0f);
+                int tunnelWidth = _rndGen.RandomChoice(config.tunnelWidths);
+                _kernelGenerator.ForceKernelConfig(tunnelWidth, 0.0f, tunnelWidth, 0.0f);
                 _tunnelDir = GetBestMove();
             }
 
@@ -296,7 +298,9 @@ namespace Generator
             PlaceRoomBorder(config.initPosition.x, config.initPosition.y, 10, 10, 1, 1, BlockType.Start);
 
             if (config.generatePlatforms)
-                GeneratePlatforms();
+            {
+                GeneratePlatforms(700, 4, 4, 0, 4);
+            }
         }
 
         public Vector2Int GetCurrentTargetPos()
@@ -384,15 +388,8 @@ namespace Generator
             }
         }
 
-        private void GeneratePlatforms()
+        private void GeneratePlatforms(int minPlatformDistance, int safeTop, int safeRight, int safeDown, int safeLeft)
         {
-            // very WIP, but kinda works? TODO: add parameters to config 
-            int minPlatformDistance = 1000; // an average distance might allow for better platform placement
-            int safeTop = 4;
-            int safeRight = 4;
-            int safeDown = 1;
-            int safeLeft = 4;
-
             int lastPlatformIndex = 0;
             int currentPositionIndex = 0;
             int positionsCount = _positions.Count;

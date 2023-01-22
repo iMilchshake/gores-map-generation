@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using UnityEngine.PlayerLoop;
+using MonoBehaviour;
 using Util;
 
 namespace Generator
@@ -22,19 +22,23 @@ namespace Generator
 
     public class KernelGenerator
     {
-        public KernelSizeConfig[] config;
+        public KernelSizeConfig[] kernelConfig;
         private RandomGenerator _rndGen;
         private float _circularity;
         private int _size;
+        private float _outerCircularity;
+        private int _outerSize;
         private bool[,] _currentKernel;
         private bool[,] _currentOuterKernel;
 
-        public KernelGenerator(KernelSizeConfig[] config, int size, float circularity, RandomGenerator rndGen)
+        public KernelGenerator(KernelSizeConfig[] kernelConfig, int size, float circularity, RandomGenerator rndGen)
         {
-            this.config = config;
+            this.kernelConfig = kernelConfig;
             _rndGen = rndGen;
             _circularity = circularity;
             _size = size;
+            _outerCircularity = circularity;
+            _outerSize = size;
 
             ValidateConfig();
             UpdateKernel();
@@ -43,11 +47,11 @@ namespace Generator
         // sanity check -> do all probabilities sum up to 1? Yes this is useful, i already fucked them up 3 times now help
         private void ValidateConfig()
         {
-            var sizeProbabilitySum = config.Sum(c => c.SizeProbability);
+            var sizeProbabilitySum = kernelConfig.Sum(c => c.SizeProbability);
             if (!MathUtil.CheckFloatEqual(sizeProbabilitySum, 1.0f))
                 throw new ArithmeticException("size probabilities dont sum up to 1");
 
-            foreach (var sizeConfig in config)
+            foreach (var sizeConfig in kernelConfig)
             {
                 var circularityProbabilitySum = sizeConfig.CirularicyProbabilities.Sum(c => c.Probability);
                 if (!MathUtil.CheckFloatEqual(circularityProbabilitySum, 1.0f))
@@ -56,28 +60,34 @@ namespace Generator
             }
         }
 
-        public void Mutate(float sizeUpdateProbability, float circularityUpdateProbability)
+        public void Mutate(MapGenerationConfig config)
         {
-            var updateSize = _rndGen.RandomBool(sizeUpdateProbability);
-            var updateCircularity = _rndGen.RandomBool(circularityUpdateProbability);
+            var updateSize = _rndGen.RandomBool(config.kernelSizeChangeProb);
+            var updateCircularity = _rndGen.RandomBool(config.kernelCircularityChangeProb);
 
             if (updateSize)
             {
-                var probabilities = config.Select(c => c.SizeProbability).ToArray();
-                var sizes = config.Select(c => c.Size).ToArray();
+                // update inner kernel
+                var probabilities = kernelConfig.Select(c => c.SizeProbability).ToArray();
+                var sizes = kernelConfig.Select(c => c.Size).ToArray();
                 var selectedSize = _rndGen.RandomRouletteSelect(sizes, probabilities);
                 _size = selectedSize;
+
+                // update outer kernel
+                _outerSize = _rndGen.RandomBool(config.kernelOuterSizeMarginProb) ? _size + 2 : _size;
             }
 
             if (updateCircularity)
             {
                 // get correct sizeConfig
-                var index = Array.FindIndex(config, sizeConfig => sizeConfig.Size == _size);
+                var index = Array.FindIndex(kernelConfig, sizeConfig => sizeConfig.Size == _size);
 
-                var circularities = config[index].CirularicyProbabilities.Select(c => c.Circularity).ToArray();
-                var probabilities = config[index].CirularicyProbabilities.Select(c => c.Probability).ToArray();
+                var circularities = kernelConfig[index].CirularicyProbabilities.Select(c => c.Circularity).ToArray();
+                var probabilities = kernelConfig[index].CirularicyProbabilities.Select(c => c.Probability).ToArray();
                 var selectedCircularity = _rndGen.RandomRouletteSelect(circularities, probabilities);
+
                 _circularity = selectedCircularity;
+                _outerCircularity = _rndGen.RandomBool(config.kernelOuterCircularityProb) ? _circularity : 0.0f;
             }
 
             // if a change occured -> update current kernel
@@ -90,8 +100,7 @@ namespace Generator
         private void UpdateKernel()
         {
             _currentKernel = GetKernel(_size, _circularity);
-            _currentOuterKernel = GetKernel(_size + _rndGen.RandomChoice(new[] { 0, 0, 0, 0, 0, 0, 0, 0, 2 }),
-                _rndGen.RandomChoice(new[] { 0.0f, _circularity, _circularity, _circularity, _circularity }));
+            _currentOuterKernel = GetKernel(_outerSize, _outerCircularity);
         }
 
         public bool[,] GetCurrentKernel()
@@ -129,10 +138,13 @@ namespace Generator
             return kernel;
         }
 
-        public void ForceKernelConfig(int size, float circularity)
+        public void ForceKernelConfig(int size, float circularity, int outerSize, float outerCircularity)
         {
             _size = size;
             _circularity = circularity;
+            _outerSize = outerSize;
+            _outerCircularity = outerCircularity;
+
             UpdateKernel();
         }
     }
