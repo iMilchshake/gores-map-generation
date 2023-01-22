@@ -1,6 +1,7 @@
 ﻿using System;
 using Generator;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.Tilemaps;
 using Util;
 
@@ -19,7 +20,7 @@ namespace Rendering
         public Color startColor;
         public Color finishColor;
         public Color spawnColor;
-        public Color reservedFreezeColor;
+        public Color marginFreezeColor;
     }
 
     public class MapRenderer
@@ -63,7 +64,7 @@ namespace Rendering
                     BlockType.Start => _mapColorPalette.startColor,
                     BlockType.Finish => _mapColorPalette.finishColor,
                     BlockType.Spawn => _mapColorPalette.spawnColor,
-                    BlockType.ReservedFreeze => _mapColorPalette.reservedFreezeColor,
+                    BlockType.MarginFreeze => _mapColorPalette.marginFreezeColor,
                     _ => throw new ArgumentOutOfRangeException()
                 });
             }

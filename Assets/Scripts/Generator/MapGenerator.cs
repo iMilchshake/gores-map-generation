@@ -239,7 +239,7 @@ namespace Generator
             _positions.Add(new Vector2Int(WalkerPos.x, WalkerPos.y));
 
             // apply outer kernel (update freeze, only override walls)
-            Map.SetBlocks(WalkerPos.x, WalkerPos.y, _kernelGenerator.GetCurrentOuterKernel(), BlockType.ReservedFreeze,
+            Map.SetBlocks(WalkerPos.x, WalkerPos.y, _kernelGenerator.GetCurrentOuterKernel(), BlockType.MarginFreeze,
                 updateBlocksOnly: true);
 
             // apply inner kernel (set as empty)
@@ -362,7 +362,7 @@ namespace Generator
                     // if a hookable tile is nearby -> set freeze
                     if (Map[x, y] == BlockType.Empty &&
                         (Map.CheckTypeInArea(x - 1, y - 1, x + 1, y + 1, BlockType.Hookable) ||
-                         Map.CheckTypeInArea(x - 1, y - 1, x + 1, y + 1, BlockType.ReservedFreeze)))
+                         Map.CheckTypeInArea(x - 1, y - 1, x + 1, y + 1, BlockType.MarginFreeze)))
                     {
                         Map[x, y] = BlockType.Freeze;
                     }

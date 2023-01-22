@@ -271,7 +271,7 @@ MonoBehaviour:
     startColor: {r: 0.3787586, g: 0.8773585, b: 0.29383236, a: 0.54509807}
     finishColor: {r: 0.745283, g: 0.2917853, b: 0.36674345, a: 0.54509807}
     spawnColor: {r: 0.10524208, g: 0.25235626, b: 0.5188679, a: 1}
-    reservedFreezeColor: {r: 0.011764706, g: 0, b: 0.050980393, a: 0.9490196}
+    marginFreezeColor: {r: 0.011764706, g: 0, b: 0.050980393, a: 0.9490196}
   iterationsPerUpdate: 30001
   testTile: {fileID: 11400000, guid: 90eb860a658bd4844ae85ee037f34897, type: 2}
   tilemap: {fileID: 2122914868}

@@ -5,7 +5,7 @@
         Hookable,
         Unhookable,
         Freeze,
-        ReservedFreeze, // counts as empty for freeze generation, but will be generated as freeze 
+        MarginFreeze, // counts as empty for freeze generation, but will be generated as freeze 
         Empty,
         Obstacle,
         Platform,

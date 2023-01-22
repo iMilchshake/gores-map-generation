@@ -114,7 +114,7 @@ namespace MonoBehaviour
 
             _mapGen = new MapGenerator(configuration);
             _mapRenderer.UpdateColorMap(mapColorPalette);
-            Debug.Log("" + mapColorPalette.reservedFreezeColor);
+            Debug.Log("" + mapColorPalette.marginFreezeColor);
             _generating = true;
             _currentIteration = 0;
         }
