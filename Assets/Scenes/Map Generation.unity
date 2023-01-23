@@ -277,23 +277,12 @@ MonoBehaviour:
   tilemap: {fileID: 2122914868}
   lockSeed: 0
   autoGenerate: 0
-  configuration:
+  generationConfig:
+    configName: main
     maxIterations: 30000
     mapHeight: 600
     mapWidth: 600
-    seed: 147448022
-    targetPositions:
-    - {x: 400, y: 300}
-    - {x: 450, y: 350}
-    - {x: 150, y: 350}
-    - {x: 150, y: 300}
-    - {x: 300, y: 250}
-    - {x: 500, y: 250}
-    - {x: 550, y: 300}
-    - {x: 450, y: 400}
-    - {x: 150, y: 400}
-    - {x: 50, y: 350}
-    - {x: 50, y: 300}
+    seed: 1
     generatePlatforms: 1
     enableTunnelMode: 1
     initPosition: {x: 300, y: 300}
@@ -350,6 +339,20 @@ MonoBehaviour:
     distanceThreshold: 5.5
     preDistanceNoise: 0.001
     gridDistance: 25
+  layoutConfig:
+    layoutName: spiral
+    waypoints:
+    - {x: 400, y: 300}
+    - {x: 450, y: 350}
+    - {x: 150, y: 350}
+    - {x: 150, y: 300}
+    - {x: 300, y: 250}
+    - {x: 500, y: 250}
+    - {x: 550, y: 300}
+    - {x: 450, y: 400}
+    - {x: 150, y: 400}
+    - {x: 50, y: 350}
+    - {x: 50, y: 300}
 --- !u!4 &714146207
 Transform:
   m_ObjectHideFlags: 0

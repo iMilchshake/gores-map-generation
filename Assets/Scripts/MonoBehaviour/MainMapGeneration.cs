@@ -2,6 +2,7 @@ using System;
 using Generator;
 using Rendering;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.Tilemaps;
 using Util;
 using Random = System.Random;
@@ -9,14 +10,22 @@ using Random = System.Random;
 namespace MonoBehaviour
 {
     [Serializable]
+    public struct MapLayoutConfig
+    {
+        public string layoutName;
+        public Vector2Int[] waypoints;
+    }
+
+    [Serializable]
     public struct MapGenerationConfig
     {
+        public string configName;
+
         // general map config 
         public int maxIterations;
         public int mapHeight;
         public int mapWidth;
         public int seed;
-        public Vector2Int[] targetPositions;
         public bool generatePlatforms;
         public bool enableTunnelMode;
 
@@ -59,7 +68,8 @@ namespace MonoBehaviour
 
         [Header("Generation Config")] public bool lockSeed;
         public bool autoGenerate;
-        public MapGenerationConfig configuration;
+        public MapGenerationConfig generationConfig;
+        public MapLayoutConfig layoutConfig;
 
         // generation state
         private bool _generating = false;
@@ -68,7 +78,7 @@ namespace MonoBehaviour
         void Start()
         {
             _seedGenerator = new Random(42);
-            _mapRenderer = new MapRenderer(testTile, tilemap, configuration.mapWidth, configuration.mapHeight,
+            _mapRenderer = new MapRenderer(testTile, tilemap, generationConfig.mapWidth, generationConfig.mapHeight,
                 mapColorPalette);
 
             StartGeneration();
@@ -81,8 +91,9 @@ namespace MonoBehaviour
 
             if (Input.GetKeyDown("e") && !_generating)
             {
-                Debug.Log($"exporting map {_mapGen.GetSeed()}");
-                _mapGen.Map.ExportMap("" + _mapGen.GetSeed());
+                string mapName = $"{generationConfig.configName}_{layoutConfig.layoutName}_{generationConfig.seed}";
+                Debug.Log($"exporting map {mapName}");
+                _mapGen.Map.ExportMap(mapName);
                 Debug.Log("done");
             }
 
@@ -94,7 +105,7 @@ namespace MonoBehaviour
                     _mapGen.Step();
                     _currentIteration++;
 
-                    if (_currentIteration > configuration.maxIterations || _mapGen.finished)
+                    if (_currentIteration > generationConfig.maxIterations || _mapGen.finished)
                     {
                         _generating = false;
                         _mapGen.OnFinish();
@@ -112,9 +123,9 @@ namespace MonoBehaviour
         private void StartGeneration()
         {
             if (!lockSeed)
-                configuration.seed = _seedGenerator.Next();
+                generationConfig.seed = _seedGenerator.Next();
 
-            _mapGen = new MapGenerator(configuration);
+            _mapGen = new MapGenerator(generationConfig, layoutConfig);
             _mapRenderer.UpdateColorMap(mapColorPalette);
             Debug.Log("" + mapColorPalette.marginFreezeColor);
             _generating = true;

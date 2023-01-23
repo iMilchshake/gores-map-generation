@@ -166,7 +166,8 @@ namespace Generator
     public class MapGenerator
     {
         // config
-        public MapGenerationConfig config;
+        public MapGenerationConfig generationConfig;
+        public MapLayoutConfig layoutConfig;
 
         // data structures
         public Map Map { get; }
@@ -186,25 +187,26 @@ namespace Generator
         private int _tunnelRemainingSteps = 0;
         private Vector2Int _tunnelDir;
 
-        public MapGenerator(MapGenerationConfig config)
+        public MapGenerator(MapGenerationConfig generationConfig, MapLayoutConfig layoutConfig)
         {
-            this.config = config;
+            this.generationConfig = generationConfig;
+            this.layoutConfig = layoutConfig;
 
-            Map = new Map(config.mapWidth, config.mapHeight);
-            _rndGen = new RandomGenerator(config.seed);
+            Map = new Map(generationConfig.mapWidth, generationConfig.mapHeight);
+            _rndGen = new RandomGenerator(generationConfig.seed);
             _positions = new List<Vector2Int>();
             _positions.Add(new Vector2Int(WalkerPos.x, WalkerPos.y));
             _kernelGenerator =
-                new KernelGenerator(config.kernelConfig, config.initKernelSize, config.initKernelCircularity, _rndGen);
+                new KernelGenerator(generationConfig.kernelConfig, generationConfig.initKernelSize, generationConfig.initKernelCircularity, _rndGen);
 
-            WalkerPos = config.initPosition;
+            WalkerPos = generationConfig.initPosition;
             _kernel = _kernelGenerator.GetCurrentKernel();
             _walkerState = MapGeneratorState.DistanceProbability; // start default mode 
         }
 
         public int GetSeed()
         {
-            return config.seed;
+            return generationConfig.seed;
         }
 
         private Vector2Int StepTunnel()
@@ -212,7 +214,7 @@ namespace Generator
             if (_tunnelRemainingSteps <= 0)
             {
                 _walkerState = MapGeneratorState.DistanceProbability;
-                _kernelGenerator.Mutate(config);
+                _kernelGenerator.Mutate(generationConfig);
             }
 
             _tunnelRemainingSteps--;
@@ -223,14 +225,14 @@ namespace Generator
         {
             var distanceProbabilities = GetDistanceProbabilities();
             var pickedMove = _rndGen.PickRandomMove(distanceProbabilities);
-            _kernelGenerator.Mutate(config);
+            _kernelGenerator.Mutate(generationConfig);
 
             // switch to tunnel mode with a certain probability TODO: state pattern?
-            if (config.enableTunnelMode && _rndGen.RandomBool(config.tunnelProbability))
+            if (generationConfig.enableTunnelMode && _rndGen.RandomBool(generationConfig.tunnelProbability))
             {
                 _walkerState = MapGeneratorState.Tunnel;
-                _tunnelRemainingSteps = _rndGen.RandomChoice(config.tunnelLengths);
-                int tunnelWidth = _rndGen.RandomChoice(config.tunnelWidths);
+                _tunnelRemainingSteps = _rndGen.RandomChoice(generationConfig.tunnelLengths);
+                int tunnelWidth = _rndGen.RandomChoice(generationConfig.tunnelWidths);
                 _kernelGenerator.ForceKernelConfig(tunnelWidth, 0.0f, tunnelWidth, 0.0f);
                 _tunnelDir = GetBestMove();
             }
@@ -266,9 +268,9 @@ namespace Generator
             // update targetPosition if current one was reached
             Vector2Int currentTarget = GetCurrentTargetPos();
             bool targetReached = Math.Abs(WalkerPos.x - currentTarget.x) + Math.Abs(WalkerPos.y - currentTarget.y) <=
-                                 config.waypointReachedDistance;
+                                 generationConfig.waypointReachedDistance;
 
-            bool targetsLeft = _walkerTargetPosIndex < config.targetPositions.Length - 1;
+            bool targetsLeft = _walkerTargetPosIndex < layoutConfig.waypoints.Length - 1;
             if (targetsLeft && targetReached)
             {
                 _walkerTargetPosIndex++;
@@ -283,21 +285,21 @@ namespace Generator
 
         public void OnFinish()
         {
-            FillSpaceWithObstacles(config.distanceTransformMethod, config.distanceThreshold, config.preDistanceNoise,
-                config.gridDistance);
+            FillSpaceWithObstacles(generationConfig.distanceTransformMethod, generationConfig.distanceThreshold, generationConfig.preDistanceNoise,
+                generationConfig.gridDistance);
 
             GenerateFreeze();
 
             PlaceRoom(WalkerPos.x, WalkerPos.y, 10, 10, 0, 0, BlockType.Finish);
-            PlaceRoom(config.initPosition.x, config.initPosition.y, 10, 10, 0, 0, BlockType.Start);
+            PlaceRoom(generationConfig.initPosition.x, generationConfig.initPosition.y, 10, 10, 0, 0, BlockType.Start);
             PlacePlatform(WalkerPos.x, WalkerPos.y);
-            PlacePlatform(config.initPosition.x, config.initPosition.y);
-            Map[config.initPosition.x, config.initPosition.y + 1] = BlockType.Spawn;
+            PlacePlatform(generationConfig.initPosition.x, generationConfig.initPosition.y);
+            Map[generationConfig.initPosition.x, generationConfig.initPosition.y + 1] = BlockType.Spawn;
 
             PlaceRoomBorder(WalkerPos.x, WalkerPos.y, 10, 10, 1, 1, BlockType.Finish);
-            PlaceRoomBorder(config.initPosition.x, config.initPosition.y, 10, 10, 1, 1, BlockType.Start);
+            PlaceRoomBorder(generationConfig.initPosition.x, generationConfig.initPosition.y, 10, 10, 1, 1, BlockType.Start);
 
-            if (config.generatePlatforms)
+            if (generationConfig.generatePlatforms)
             {
                 GeneratePlatforms(700, 4, 4, 0, 4);
             }
@@ -305,7 +307,7 @@ namespace Generator
 
         public Vector2Int GetCurrentTargetPos()
         {
-            return config.targetPositions[_walkerTargetPosIndex];
+            return layoutConfig.waypoints[_walkerTargetPosIndex];
         }
 
         private MoveArray GetDistanceProbabilities()
@@ -323,7 +325,7 @@ namespace Generator
 
             // assign each move a probability based on their index in the sorted order
             for (var i = 0; i < moveArray.size; i++)
-                moveArray.probabilities[i] = MathUtil.GeometricDistribution(i + 1, config.bestMoveProbability);
+                moveArray.probabilities[i] = MathUtil.GeometricDistribution(i + 1, generationConfig.bestMoveProbability);
 
             moveArray.Normalize(); // normalize the probabilities so that they sum up to 1
 
@@ -374,9 +376,9 @@ namespace Generator
         private void GenerateFreeze()
         {
             // iterate over every cell of the map
-            for (var x = 0; x < config.mapWidth; x++)
+            for (var x = 0; x < generationConfig.mapWidth; x++)
             {
-                for (var y = 0; y < config.mapHeight; y++)
+                for (var y = 0; y < generationConfig.mapHeight; y++)
                 {
                     if (Map[x, y] == BlockType.Empty &&
                         (Map.CheckTypeInArea(x - 1, y - 1, x + 1, y + 1, BlockType.Hookable) ||
