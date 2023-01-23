@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using Generator;
-using Mono.Cecil.Cil;
 using Newtonsoft.Json;
-using UnityEngine;
 using Util;
 
 namespace IO
@@ -80,6 +78,22 @@ namespace IO
             CreateInfoJson(mapName);
             CreateGroupsJson(mapName);
             CreateGameLayer(mapName, map);
+
+            ConvertDirMap(mapName);
+
+            // remove mapDir
+            Directory.Delete($@"{MapDir}\{mapName}", true);
+        }
+
+        public static void ConvertDirMap(string mapName)
+        {
+            Process process = new Process();
+            process.StartInfo.FileName = "cmd.exe"; // TODO: currently only works on windows
+            process.StartInfo.Arguments =
+                @$"/C python Assets\Scripts\IO\converter.py -i {MapDir}/{mapName} -o {MapDir}/{mapName}.map";
+            process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+            process.Start();
+            process.WaitForExit();
         }
 
         private static void CreateInfoJson(string mapName)
