@@ -64,7 +64,7 @@ namespace IO
 
     public class MapSerializer
     {
-        private const string MapDir = "GeneratedMaps";
+        private const string MapDir = "Assets/GeneratedMaps/";
         // This class can export a given map in the "MapDir" format
         // Requires a tool like https://gitlab.com/Patiga/twmap to convert to a playable .map
 

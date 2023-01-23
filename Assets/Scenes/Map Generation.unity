@@ -212,7 +212,8 @@ Transform:
   m_LocalPosition: {x: 300, y: 300, z: -0.5}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1621499269}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -278,69 +279,30 @@ MonoBehaviour:
   lockSeed: 0
   autoGenerate: 0
   generationConfig:
-    configName: main
-    maxIterations: 30000
-    mapHeight: 600
-    mapWidth: 600
-    seed: 1
+    configName: 
+    maxIterations: 0
+    seed: 0
     generatePlatforms: 1
     enableTunnelMode: 1
-    initPosition: {x: 300, y: 300}
-    initKernelSize: 6
-    initKernelCircularity: 0.5
-    bestMoveProbability: 0.12
-    kernelSizeChangeProb: 0.2
-    kernelCircularityChangeProb: 0.5
-    kernelOuterSizeMarginProb: 0.2
-    kernelOuterCircularityProb: 0.5
-    waypointReachedDistance: 5
-    kernelConfig:
-    - Size: 3
-      SizeProbability: 0
-      CirularicyProbabilities:
-      - Circularity: 0
-        Probability: 1
-    - Size: 4
-      SizeProbability: 0.4
-      CirularicyProbabilities:
-      - Circularity: 0
-        Probability: 0.8
-      - Circularity: 0.5
-        Probability: 0.2
-    - Size: 5
-      SizeProbability: 0.3
-      CirularicyProbabilities:
-      - Circularity: 0
-        Probability: 0.75
-      - Circularity: 0.5
-        Probability: 0.25
-    - Size: 6
-      SizeProbability: 0.2
-      CirularicyProbabilities:
-      - Circularity: 0
-        Probability: 0.6
-      - Circularity: 0.35
-        Probability: 0.3
-      - Circularity: 0.8
-        Probability: 0.1
-    - Size: 7
-      SizeProbability: 0.1
-      CirularicyProbabilities:
-      - Circularity: 0
-        Probability: 0.6
-      - Circularity: 0.35
-        Probability: 0.3
-      - Circularity: 0.8
-        Probability: 0.1
-    tunnelProbability: 0.008
-    tunnelLengths: 080000000c000000
-    tunnelWidths: 04000000050000000500000005000000
+    initKernelSize: 0
+    initKernelCircularity: 0
+    bestMoveProbability: 0
+    kernelSizeChangeProb: 0
+    kernelCircularityChangeProb: 0
+    kernelOuterSizeMarginProb: 0
+    kernelOuterCircularityProb: 0
+    waypointReachedDistance: 0
+    kernelConfig: []
+    tunnelProbability: 0
+    tunnelLengths: 
+    tunnelWidths: 
     distanceTransformMethod: 3
-    distanceThreshold: 5.5
-    preDistanceNoise: 0.001
-    gridDistance: 25
+    distanceThreshold: 0
+    preDistanceNoise: 0
+    gridDistance: 0
   layoutConfig:
     layoutName: spiral
+    initPosition: {x: 300, y: 300}
     waypoints:
     - {x: 400, y: 300}
     - {x: 450, y: 350}
@@ -353,6 +315,8 @@ MonoBehaviour:
     - {x: 150, y: 400}
     - {x: 50, y: 350}
     - {x: 50, y: 300}
+    mapHeight: 600
+    mapWidth: 600
 --- !u!4 &714146207
 Transform:
   m_ObjectHideFlags: 0
@@ -458,6 +422,68 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1621499268
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1621499269}
+  - component: {fileID: 1621499270}
+  - component: {fileID: 1621499271}
+  m_Layer: 5
+  m_Name: UIDocument
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1621499269
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1621499268}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 519420032}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1621499270
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1621499268}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PanelSettings: {fileID: 11400000, guid: d71f29dd97cb05b45be6c62e3edf5059, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 9197481963319205126, guid: 0d155435656686f489c26f6cad81c332, type: 3}
+  m_SortingOrder: 0
+--- !u!114 &1621499271
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1621499268}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94bdcb4d4e931594890858bc01dd737d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uiDocument: {fileID: 1621499270}
 --- !u!1 &1637550584
 GameObject:
   m_ObjectHideFlags: 0

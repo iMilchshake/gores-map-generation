@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); width: 300px; justify-content: flex-start; align-self: auto; align-items: flex-start;">
+        <ui:GroupBox style="flex-direction: row;">
+            <ui:Label tabindex="-1" text="Config" display-tooltip-when-elided="true" />
+            <ui:DropdownField index="-1" name="generationConfig" style="align-items: center; justify-content: space-around; align-self: stretch; flex-direction: row; flex-wrap: nowrap; width: auto;" />
+        </ui:GroupBox>
+        <ui:GroupBox style="flex-direction: row;">
+            <ui:Button text="Export Config" display-tooltip-when-elided="true" name="exportConfigButton" />
+        </ui:GroupBox>
+    </ui:VisualElement>
+    <ui:Label tabindex="-1" text="by iMilchshake" display-tooltip-when-elided="true" style="position: relative; top: 0; left: 0;" />
+</ui:UXML>

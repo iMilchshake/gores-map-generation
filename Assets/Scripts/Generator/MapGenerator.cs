@@ -192,14 +192,15 @@ namespace Generator
             this.generationConfig = generationConfig;
             this.layoutConfig = layoutConfig;
 
-            Map = new Map(generationConfig.mapWidth, generationConfig.mapHeight);
+            Map = new Map(this.layoutConfig.mapWidth, layoutConfig.mapHeight);
             _rndGen = new RandomGenerator(generationConfig.seed);
             _positions = new List<Vector2Int>();
             _positions.Add(new Vector2Int(WalkerPos.x, WalkerPos.y));
             _kernelGenerator =
-                new KernelGenerator(generationConfig.kernelConfig, generationConfig.initKernelSize, generationConfig.initKernelCircularity, _rndGen);
+                new KernelGenerator(generationConfig.kernelConfig, generationConfig.initKernelSize,
+                    generationConfig.initKernelCircularity, _rndGen);
 
-            WalkerPos = generationConfig.initPosition;
+            WalkerPos = layoutConfig.initPosition;
             _kernel = _kernelGenerator.GetCurrentKernel();
             _walkerState = MapGeneratorState.DistanceProbability; // start default mode 
         }
@@ -285,19 +286,21 @@ namespace Generator
 
         public void OnFinish()
         {
-            FillSpaceWithObstacles(generationConfig.distanceTransformMethod, generationConfig.distanceThreshold, generationConfig.preDistanceNoise,
+            FillSpaceWithObstacles(generationConfig.distanceTransformMethod, generationConfig.distanceThreshold,
+                generationConfig.preDistanceNoise,
                 generationConfig.gridDistance);
 
             GenerateFreeze();
 
             PlaceRoom(WalkerPos.x, WalkerPos.y, 10, 10, 0, 0, BlockType.Finish);
-            PlaceRoom(generationConfig.initPosition.x, generationConfig.initPosition.y, 10, 10, 0, 0, BlockType.Start);
+            PlaceRoom(layoutConfig.initPosition.x, layoutConfig.initPosition.y, 10, 10, 0, 0, BlockType.Start);
             PlacePlatform(WalkerPos.x, WalkerPos.y);
-            PlacePlatform(generationConfig.initPosition.x, generationConfig.initPosition.y);
-            Map[generationConfig.initPosition.x, generationConfig.initPosition.y + 1] = BlockType.Spawn;
+            PlacePlatform(layoutConfig.initPosition.x, layoutConfig.initPosition.y);
+            Map[layoutConfig.initPosition.x, layoutConfig.initPosition.y + 1] = BlockType.Spawn;
 
             PlaceRoomBorder(WalkerPos.x, WalkerPos.y, 10, 10, 1, 1, BlockType.Finish);
-            PlaceRoomBorder(generationConfig.initPosition.x, generationConfig.initPosition.y, 10, 10, 1, 1, BlockType.Start);
+            PlaceRoomBorder(layoutConfig.initPosition.x, layoutConfig.initPosition.y, 10, 10, 1, 1,
+                BlockType.Start);
 
             if (generationConfig.generatePlatforms)
             {
@@ -325,7 +328,8 @@ namespace Generator
 
             // assign each move a probability based on their index in the sorted order
             for (var i = 0; i < moveArray.size; i++)
-                moveArray.probabilities[i] = MathUtil.GeometricDistribution(i + 1, generationConfig.bestMoveProbability);
+                moveArray.probabilities[i] =
+                    MathUtil.GeometricDistribution(i + 1, generationConfig.bestMoveProbability);
 
             moveArray.Normalize(); // normalize the probabilities so that they sum up to 1
 
@@ -376,9 +380,9 @@ namespace Generator
         private void GenerateFreeze()
         {
             // iterate over every cell of the map
-            for (var x = 0; x < generationConfig.mapWidth; x++)
+            for (var x = 0; x < layoutConfig.mapWidth; x++)
             {
-                for (var y = 0; y < generationConfig.mapHeight; y++)
+                for (var y = 0; y < layoutConfig.mapHeight; y++)
                 {
                     if (Map[x, y] == BlockType.Empty &&
                         (Map.CheckTypeInArea(x - 1, y - 1, x + 1, y + 1, BlockType.Hookable) ||

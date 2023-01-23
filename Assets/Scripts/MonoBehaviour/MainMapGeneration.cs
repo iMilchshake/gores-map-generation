@@ -1,11 +1,15 @@
 using System;
 using Generator;
+using IO;
 using Rendering;
+using UI;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.Tilemaps;
 using Util;
 using Random = System.Random;
+using Tile = UnityEngine.Tilemaps.Tile;
 
 namespace MonoBehaviour
 {
@@ -13,7 +17,10 @@ namespace MonoBehaviour
     public struct MapLayoutConfig
     {
         public string layoutName;
+        public Vector2Int initPosition;
         public Vector2Int[] waypoints;
+        public int mapHeight;
+        public int mapWidth;
     }
 
     [Serializable]
@@ -23,14 +30,11 @@ namespace MonoBehaviour
 
         // general map config 
         public int maxIterations;
-        public int mapHeight;
-        public int mapWidth;
         public int seed;
         public bool generatePlatforms;
         public bool enableTunnelMode;
 
         // initial state
-        public Vector2Int initPosition;
         public int initKernelSize;
         public float initKernelCircularity;
 
@@ -57,6 +61,7 @@ namespace MonoBehaviour
 
     public class MainMapGeneration : UnityEngine.MonoBehaviour
     {
+        public static MainMapGeneration instance;
         private MapGenerator _mapGen;
         private Random _seedGenerator;
         private MapRenderer _mapRenderer;
@@ -75,12 +80,21 @@ namespace MonoBehaviour
         private bool _generating = false;
         private int _currentIteration = 0;
 
+        private void Awake()
+        {
+            instance = this;
+        }
+
         void Start()
         {
             _seedGenerator = new Random(42);
-            _mapRenderer = new MapRenderer(testTile, tilemap, generationConfig.mapWidth, generationConfig.mapHeight,
+            _mapRenderer = new MapRenderer(testTile, tilemap, layoutConfig.mapWidth, layoutConfig.mapHeight,
                 mapColorPalette);
 
+            Debug.Log(string.Join(",", ConfigSerializer.GetConfigNames()));
+
+            // ConfigSerializer.ExportConfig(generationConfig);
+            // generationConfig = ConfigSerializer.ImportConfig("main");
             StartGeneration();
         }
 
@@ -109,6 +123,7 @@ namespace MonoBehaviour
                     {
                         _generating = false;
                         _mapGen.OnFinish();
+                        UIHandler.instance.SetEnabled(true);
                         _mapRenderer.DisplayMap(_mapGen.Map);
                         Debug.Log($"finished with {_currentIteration} iterations");
                         break;
@@ -130,6 +145,8 @@ namespace MonoBehaviour
             Debug.Log("" + mapColorPalette.marginFreezeColor);
             _generating = true;
             _currentIteration = 0;
+
+            UIHandler.instance.SetEnabled(false); // disable UI
         }
     }
 }

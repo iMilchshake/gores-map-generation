@@ -1,0 +1,106 @@
+{
+  "configName": "insane",
+  "maxIterations": 30000,
+  "seed": 1391882737,
+  "generatePlatforms": true,
+  "enableTunnelMode": true,
+  "initKernelSize": 3,
+  "initKernelCircularity": 0.8,
+  "bestMoveProbability": 0.2,
+  "kernelSizeChangeProb": 0.95,
+  "kernelCircularityChangeProb": 0.5,
+  "kernelOuterSizeMarginProb": 0.05,
+  "kernelOuterCircularityProb": 0.5,
+  "waypointReachedDistance": 5,
+  "kernelConfig": [
+    {
+      "Size": 3,
+      "SizeProbability": 0.9,
+      "CirularicyProbabilities": [
+        {
+          "Circularity": 0.0,
+          "Probability": 1.0
+        }
+      ]
+    },
+    {
+      "Size": 4,
+      "SizeProbability": 0.1,
+      "CirularicyProbabilities": [
+        {
+          "Circularity": 0.0,
+          "Probability": 0.8
+        },
+        {
+          "Circularity": 0.5,
+          "Probability": 0.2
+        }
+      ]
+    },
+    {
+      "Size": 5,
+      "SizeProbability": 0.0,
+      "CirularicyProbabilities": [
+        {
+          "Circularity": 0.0,
+          "Probability": 0.75
+        },
+        {
+          "Circularity": 0.5,
+          "Probability": 0.25
+        }
+      ]
+    },
+    {
+      "Size": 6,
+      "SizeProbability": 0.0,
+      "CirularicyProbabilities": [
+        {
+          "Circularity": 0.0,
+          "Probability": 0.6
+        },
+        {
+          "Circularity": 0.35,
+          "Probability": 0.3
+        },
+        {
+          "Circularity": 0.8,
+          "Probability": 0.1
+        }
+      ]
+    },
+    {
+      "Size": 7,
+      "SizeProbability": 0.0,
+      "CirularicyProbabilities": [
+        {
+          "Circularity": 0.0,
+          "Probability": 0.6
+        },
+        {
+          "Circularity": 0.35,
+          "Probability": 0.3
+        },
+        {
+          "Circularity": 0.8,
+          "Probability": 0.1
+        }
+      ]
+    }
+  ],
+  "tunnelProbability": 0.005,
+  "tunnelLengths": [
+    8,
+    12
+  ],
+  "tunnelWidths": [
+    3,
+    3,
+    3,
+    4
+  ],
+  "distanceTransformMethod": 3,
+  "distanceThreshold": 4.5,
+  "preDistanceNoise": 0.0,
+  "gridDistance": 50
+}
