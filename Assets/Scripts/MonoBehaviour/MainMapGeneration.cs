@@ -91,7 +91,7 @@ namespace MonoBehaviour
             _mapRenderer = new MapRenderer(testTile, tilemap, layoutConfig.mapWidth, layoutConfig.mapHeight,
                 mapColorPalette);
 
-            Debug.Log(string.Join(",", ConfigSerializer.GetConfigNames()));
+            Debug.Log(string.Join(",", ConfigSerializer.GetMapGenerationConfigs()));
 
             // ConfigSerializer.ExportConfig(generationConfig);
             // generationConfig = ConfigSerializer.ImportConfig("main");

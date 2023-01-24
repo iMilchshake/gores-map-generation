@@ -1,0 +1,91 @@
+{
+  "layoutName": "zigzag_tower",
+  "initPosition": {
+    "x": 50,
+    "y": 50,
+    "magnitude": 70.71068,
+    "sqrMagnitude": 5000
+  },
+  "waypoints": [
+    {
+      "x": 300,
+      "y": 50,
+      "magnitude": 304.138123,
+      "sqrMagnitude": 92500
+    },
+    {
+      "x": 300,
+      "y": 100,
+      "magnitude": 316.227753,
+      "sqrMagnitude": 100000
+    },
+    {
+      "x": 50,
+      "y": 100,
+      "magnitude": 111.8034,
+      "sqrMagnitude": 12500
+    },
+    {
+      "x": 50,
+      "y": 150,
+      "magnitude": 158.113876,
+      "sqrMagnitude": 25000
+    },
+    {
+      "x": 300,
+      "y": 150,
+      "magnitude": 335.4102,
+      "sqrMagnitude": 112500
+    },
+    {
+      "x": 300,
+      "y": 200,
+      "magnitude": 360.5551,
+      "sqrMagnitude": 130000
+    },
+    {
+      "x": 50,
+      "y": 200,
+      "magnitude": 206.155289,
+      "sqrMagnitude": 42500
+    },
+    {
+      "x": 50,
+      "y": 250,
+      "magnitude": 254.950974,
+      "sqrMagnitude": 65000
+    },
+    {
+      "x": 300,
+      "y": 250,
+      "magnitude": 390.512482,
+      "sqrMagnitude": 152500
+    },
+    {
+      "x": 300,
+      "y": 300,
+      "magnitude": 424.264069,
+      "sqrMagnitude": 180000
+    },
+    {
+      "x": 50,
+      "y": 300,
+      "magnitude": 304.138123,
+      "sqrMagnitude": 92500
+    },
+    {
+      "x": 50,
+      "y": 350,
+      "magnitude": 353.5534,
+      "sqrMagnitude": 125000
+    },
+    {
+      "x": 300,
+      "y": 350,
+      "magnitude": 460.977234,
+      "sqrMagnitude": 212500
+    }
+  ],
+  "mapHeight": 400,
+  "mapWidth": 350
+}

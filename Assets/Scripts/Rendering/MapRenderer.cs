@@ -26,26 +26,37 @@ namespace Rendering
     public class MapRenderer
     {
         private Tilemap _tilemap;
+        private Tile _tile;
         private Map _currentMap; // map that is currently displayed
         private MapColorPalette _mapColorPalette;
 
         public MapRenderer(Tile tile, Tilemap tilemap, int width, int height, MapColorPalette mapColorPalette)
         {
             _tilemap = tilemap;
+            _tile = tile;
             _mapColorPalette = mapColorPalette;
+            InitializeTiles(tile, width, height);
+        }
 
-            // initialize tiles
+        private void InitializeTiles(Tile tile, int width, int height)
+        {
             tile.flags = TileFlags.None;
             var area = new BoundsInt { size = new Vector3Int(width, height, 1) };
             TileBase[] tileArray = new TileBase[area.size.x * area.size.y * area.size.z];
             for (int index = 0; index < tileArray.Length; index++)
                 tileArray[index] = tile;
-            tilemap.SetTilesBlock(area, tileArray);
+            _tilemap.SetTilesBlock(area, tileArray);
         }
-
 
         public void DisplayMap(Map map)
         {
+            if (_currentMap != null && !Map.CheckSameDimension(map, _currentMap))
+            {
+                _tilemap.ClearAllTiles();
+                InitializeTiles(_tile, map.Width, map.Height);
+                _currentMap = null;
+            }
+
             for (int x = 0; x < map.Width; x++)
             for (int y = 0; y < map.Height; y++)
             {

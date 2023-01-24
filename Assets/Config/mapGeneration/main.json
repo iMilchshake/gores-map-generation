@@ -1,7 +1,7 @@
 {
   "configName": "main",
   "maxIterations": 30000,
-  "seed": 43,
+  "seed": 1434747710,
   "generatePlatforms": true,
   "enableTunnelMode": true,
   "initKernelSize": 6,
