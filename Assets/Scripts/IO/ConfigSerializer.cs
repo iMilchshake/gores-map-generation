@@ -23,7 +23,7 @@ namespace IO
         public static void ExportConfig(MapLayoutConfig layoutConfig)
         {
             ValidateConfigDirs();
-            var path = Path.Combine(generationConfigDir, layoutConfig.layoutName + ".json");
+            var path = Path.Combine(layoutConfigDir, layoutConfig.layoutName + ".json");
             File.WriteAllText(path, JsonConvert.SerializeObject(layoutConfig, Formatting.Indented));
         }
 

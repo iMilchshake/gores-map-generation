@@ -2,78 +2,78 @@
   "layoutName": "spiral",
   "initPosition": {
     "x": 300,
-    "y": 300,
-    "magnitude": 424.264069,
-    "sqrMagnitude": 180000
+    "y": 100,
+    "magnitude": 316.227753,
+    "sqrMagnitude": 100000
   },
   "waypoints": [
     {
       "x": 400,
-      "y": 300,
-      "magnitude": 500.0,
-      "sqrMagnitude": 250000
+      "y": 100,
+      "magnitude": 412.310577,
+      "sqrMagnitude": 170000
     },
     {
       "x": 450,
-      "y": 350,
-      "magnitude": 570.0877,
-      "sqrMagnitude": 325000
+      "y": 150,
+      "magnitude": 474.341644,
+      "sqrMagnitude": 225000
     },
     {
       "x": 150,
-      "y": 350,
-      "magnitude": 380.788666,
-      "sqrMagnitude": 145000
+      "y": 150,
+      "magnitude": 212.132034,
+      "sqrMagnitude": 45000
     },
     {
       "x": 150,
-      "y": 300,
-      "magnitude": 335.4102,
-      "sqrMagnitude": 112500
+      "y": 100,
+      "magnitude": 180.277557,
+      "sqrMagnitude": 32500
     },
     {
       "x": 300,
-      "y": 250,
-      "magnitude": 390.512482,
-      "sqrMagnitude": 152500
+      "y": 50,
+      "magnitude": 304.138123,
+      "sqrMagnitude": 92500
     },
     {
       "x": 500,
-      "y": 250,
+      "y": 50,
+      "magnitude": 502.493774,
+      "sqrMagnitude": 252500
+    },
+    {
+      "x": 550,
+      "y": 100,
       "magnitude": 559.016968,
       "sqrMagnitude": 312500
     },
     {
-      "x": 550,
-      "y": 300,
-      "magnitude": 626.4982,
-      "sqrMagnitude": 392500
-    },
-    {
       "x": 450,
-      "y": 400,
-      "magnitude": 602.0797,
-      "sqrMagnitude": 362500
+      "y": 200,
+      "magnitude": 492.4429,
+      "sqrMagnitude": 242500
     },
     {
       "x": 150,
-      "y": 400,
-      "magnitude": 427.2002,
-      "sqrMagnitude": 182500
+      "y": 200,
+      "magnitude": 250.0,
+      "sqrMagnitude": 62500
     },
     {
       "x": 50,
-      "y": 350,
-      "magnitude": 353.5534,
-      "sqrMagnitude": 125000
+      "y": 150,
+      "magnitude": 158.113876,
+      "sqrMagnitude": 25000
     },
     {
       "x": 50,
-      "y": 300,
-      "magnitude": 304.138123,
-      "sqrMagnitude": 92500
+      "y": 100,
+      "magnitude": 111.8034,
+      "sqrMagnitude": 12500
     }
   ],
-  "mapHeight": 600,
+  "mapHeight": 250,
   "mapWidth": 600
 }
