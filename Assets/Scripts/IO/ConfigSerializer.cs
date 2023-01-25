@@ -5,37 +5,38 @@ using MonoBehaviour;
 using Newtonsoft.Json;
 using UnityEngine;
 
+
 namespace IO
 {
     public class ConfigSerializer
     {
-        private const string generationConfigDir = @"Assets\Config\mapGeneration";
-        private const string layoutConfigDir = @"Assets\Config\layouts";
+        private static string generationConfigDir = Path.Combine("Assets", "Config", "mapGeneration");
+        private static string layoutConfigDir = Path.Combine("Assets", "Config", "layouts");
 
         public static void ExportConfig(MapGenerationConfig generationConfig)
         {
             ValidateConfigDirs();
-            File.WriteAllText($@"{generationConfigDir}\{generationConfig.configName}.json",
-                JsonConvert.SerializeObject(generationConfig, Formatting.Indented));
+            var path = Path.Combine(generationConfigDir, generationConfig.configName + ".json");
+            File.WriteAllText(path, JsonConvert.SerializeObject(generationConfig, Formatting.Indented));
         }
 
         public static void ExportConfig(MapLayoutConfig layoutConfig)
         {
             ValidateConfigDirs();
-            File.WriteAllText($@"{layoutConfigDir}\{layoutConfig.layoutName}.json",
-                JsonConvert.SerializeObject(layoutConfig, Formatting.Indented));
+            var path = Path.Combine(generationConfigDir, layoutConfig.layoutName + ".json");
+            File.WriteAllText(path, JsonConvert.SerializeObject(layoutConfig, Formatting.Indented));
         }
 
         public static MapGenerationConfig ImportMapGenerationConfig(string configName)
         {
-            string configText = File.ReadAllText($@"{generationConfigDir}\{configName}.json");
+            string configText = File.ReadAllText(Path.Combine(generationConfigDir, configName + ".json"));
             MapGenerationConfig generationConfig = JsonConvert.DeserializeObject<MapGenerationConfig>(configText);
             return generationConfig;
         }
 
         public static MapLayoutConfig ImportLayoutConfig(string configName)
         {
-            string configText = File.ReadAllText($@"{layoutConfigDir}\{configName}.json");
+            string configText = File.ReadAllText(Path.Combine(layoutConfigDir, configName + ".json"));
             MapLayoutConfig layoutConfig = JsonConvert.DeserializeObject<MapLayoutConfig>(configText);
             return layoutConfig;
         }

@@ -70,6 +70,7 @@ namespace UI
             configDropdown.SetEnabled(value);
             layoutDropdown.SetEnabled(value);
             exportConfigButton.SetEnabled(value);
+            exportLayoutButton.SetEnabled(value);
         }
 
         private void UpdateConfigDropdown()
