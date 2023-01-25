@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using Generator;
 using Newtonsoft.Json;
+using UnityEngine;
 using Util;
 
 namespace IO
@@ -86,6 +87,21 @@ namespace IO
         }
 
         public static void ConvertDirMap(string mapName)
+        {
+            switch (Application.platform)
+            {
+                case RuntimePlatform.WindowsEditor or RuntimePlatform.WindowsPlayer:
+                    ConvertDirMapWindows(mapName);
+                    break;
+                case RuntimePlatform.LinuxEditor or RuntimePlatform.LinuxPlayer:
+                    throw new NotImplementedException();
+                    break;
+                default:
+                    throw new ArgumentException($"platform={Application.platform} is not supported");
+            }
+        }
+
+        private static void ConvertDirMapWindows(string mapName)
         {
             Process process = new Process();
             process.StartInfo.FileName = "cmd.exe"; // TODO: currently only works on windows
